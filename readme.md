@@ -63,8 +63,7 @@ bp.addNode(node);
 
 ## Contributing
 
-If you'd like to contribute to the project, please fork the repository and submit a pull request with your changes. Be sure to follow the existing code style and include tests for any new functionality.
-
+If you'd like to contribute to the project, please fork the repository and submit a pull request with your changes.
 ## TODO
 
 - [x] GUI
