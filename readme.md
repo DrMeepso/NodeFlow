@@ -65,17 +65,17 @@ bp.addNode(node);
 
 If you'd like to contribute to the project, please fork the repository and submit a pull request with your changes. Be sure to follow the existing code style and include tests for any new functionality.
 
-## Checklist
+## TODO
 
-- [x] Install Node.js and npm
-- [x] Clone the repository
-- [x] Run `npm install`
-- [x] Run `npm start`
-- [ ] Add new functionality
-- [ ] Write tests for new functionality
-- [ ] Submit a pull request
-- [ ] Get code review
-- [ ] Merge changes into main branch
+- [x] GUI
+- [x] Get Node Engine working
+- [x] Get Node Engine working with GUI
+- [x] Blueprint exicution
+- [ ] Make Default Nodes
+- [ ] Polish GUI/Editor
+- [ ] Blueprint Save/Loading
+- [ ] (Maybe) Compile Blueprints to Lua or JS
+- [ ] (Maybe) Compile Blueprints to Abstract Syntax Tree
 
 ## License
 
