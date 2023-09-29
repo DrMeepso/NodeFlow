@@ -5,7 +5,7 @@ export class Blueprint {
 
     name: string = "Blueprint <Generic>"
     _id: string = uuidv4();
-    _isRunning: boolean = false; // unused if no GUI is present
+    _isRunning: boolean = false;
 
     allNodes: Node[] = [];
     allConnections: Connection[] = [];

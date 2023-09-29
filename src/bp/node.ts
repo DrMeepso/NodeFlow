@@ -51,7 +51,7 @@ export class Connection {
 
 }
 
-export class Node {
+export abstract class Node {
 
     _position: Vector2 = Vector2.zero;
     _id: string = uuidv4();
@@ -110,12 +110,24 @@ export class Node {
 
     }
 
-    run(runtime: Runtime) {
-
-        
-
-    }
+    abstract run(runtime: Runtime): void;
     
+}
+
+export class GenericNode extends Node {
+
+    name: string = "Generic Node"
+
+    constructor() {
+        super();
+        this.inputs = [new Input("Signal", Types.Signal)];
+        this.outputs = [new Output("Signal", Types.Signal)];
+    }
+
+    run(runtime: Runtime): void {
+        this.setOutput("Signal", null);
+    }
+
 }
 
 export class StartNode extends Node {
@@ -127,7 +139,6 @@ export class StartNode extends Node {
         this.outputs = [new Output("Signal", Types.Signal)];
     }
     run(runtime: Runtime): void {
-        super.run(runtime);
         this.setOutput("Signal", null);
     }
 }

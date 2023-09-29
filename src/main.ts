@@ -1,5 +1,5 @@
 import { Blueprint } from "./bp/blueprint";
-import { Node, StartNode, Types } from "./bp/node";
+import { Node, StartNode, Types, GenericNode } from "./bp/node";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 import { Vector2 } from "./bp/generics";
@@ -7,16 +7,16 @@ import { Vector2 } from "./bp/generics";
 const bp = new Blueprint();
 
 let StartingNode = new StartNode();
-StartingNode._position = new Vector2(0, 0);
+StartingNode._position = new Vector2(0, 0); // not required if not using GUI
 bp.addNode(StartingNode);
 
-let constNumb = new Node();
+let constNumb = new GenericNode();
 constNumb.inputs = [];
 constNumb.outputs = [];
 constNumb.addOutput("10", Types.Number);
 constNumb.addOutput("5", Types.Number);
 constNumb.name = "Constant Number";
-constNumb._position = new Vector2(100, 100);
+constNumb._position = new Vector2(100, 100); // not required if not using GUI
 constNumb.run = () => {
 
     constNumb.setOutput("10", 10);
@@ -25,14 +25,14 @@ constNumb.run = () => {
 }
 bp.addNode(constNumb);
 
-let testNode2 = new Node();
+let testNode2 = new GenericNode();
 testNode2.outputs = [];
 testNode2.inputs = [];
 testNode2.addInput("Number 1", Types.Number);
 testNode2.addInput("Number 2", Types.Number);
 testNode2.addOutput("Output 1", Types.Number);
 testNode2.name = "Addition";
-testNode2._position = new Vector2(500, 500);
+testNode2._position = new Vector2(500, 500); // not required if not using GUI
 testNode2.run = async () => {
 
     let inputs: any = testNode2.getInputs()
@@ -45,10 +45,10 @@ testNode2.run = async () => {
 }
 bp.addNode(testNode2);
 
-let testNode3 = new Node();
+let testNode3 = new GenericNode();
 testNode3.addInput("Number", Types.Number);
 testNode3.name = "Log Number";
-testNode3._position = new Vector2(500, 100);
+testNode3._position = new Vector2(500, 100); // not required if not using GUI
 testNode3.run = () => {
 
     let inputs: any = testNode3.getInputs()
