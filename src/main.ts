@@ -1,7 +1,7 @@
 import { Blueprint } from "./bp/blueprint";
 import { Node, StartNode, Types } from "./bp/node";
-import { RenderNode, GetCTX, GetCanvas, RenderConnection, RenderBlueprint } from "./render";
-import { SetupUserInteractions } from "./userInteractions";
+import { RenderBlueprint } from "./GUI/render";
+import { SetupUserInteractions } from "./GUI/userInteractions";
 import { Vector2 } from "./bp/generics";
 
 const bp = new Blueprint();
@@ -59,6 +59,15 @@ testNode3.run = () => {
 
 }
 bp.addNode(testNode3);
+
+bp.connectNodes(testNode3.inputs[0], StartingNode.outputs[0]); // starting to log
+
+bp.connectNodes(testNode2.inputs[0], constNumb.outputs[0]); // number 1
+bp.connectNodes(testNode2.inputs[1], constNumb.outputs[1]); // number 2
+
+bp.connectNodes(testNode3.inputs[1], testNode2.outputs[0]); // log number
+
+// when blueprint is run it will log 15!
 
 SetupUserInteractions(bp);
 

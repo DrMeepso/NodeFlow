@@ -1,6 +1,6 @@
-import { Blueprint } from "./bp/blueprint";
-import { Vector2 } from "./bp/generics";
-import { Connection, Node, Types } from "./bp/node";
+import { Blueprint } from "../bp/blueprint";
+import { Vector2 } from "../bp/generics";
+import { Connection, Node, Types } from "../bp/node";
 
 function Distance(a: Vector2, b: Vector2) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))

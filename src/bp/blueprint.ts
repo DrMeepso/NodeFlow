@@ -1,4 +1,4 @@
-import { Node, Connection, Types } from "./node"
+import { Node, Connection, Types, Input, Output } from "./node"
 import { v4 as uuidv4 } from 'uuid';
 
 export class Blueprint {
@@ -27,6 +27,10 @@ export class Blueprint {
     addNode(node: Node) {
         this.allNodes.push(node);
         node.parentBlueprint = this
+    }
+
+    connectNodes(input: Input, output: Output) {
+        this.allConnections.push(new Connection(input, output));
     }
 
     getNodesFromConnection(connection: Connection) {

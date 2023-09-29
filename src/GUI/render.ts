@@ -1,6 +1,6 @@
-import { Blueprint } from "./bp/blueprint";
-import { Vector2 } from "./bp/generics";
-import { Node, Connection, Types, TypeColors } from "./bp/node";
+import { Blueprint } from "../bp/blueprint";
+import { Vector2 } from "../bp/generics";
+import { Node, Connection, Types, TypeColors } from "../bp/node";
 
 const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = Canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -112,10 +112,7 @@ export function RenderNode(node: Node) {
 
 }
 
-/**
- * Renders a connection between two nodes on the canvas.
- * @param {Connection} Conn - The connection to render.
- */
+
 export function RenderConnection(Conn: Connection, parentBlueprint: Blueprint) {
 
     // use a bezier curve to draw the connection
