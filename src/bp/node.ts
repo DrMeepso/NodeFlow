@@ -67,6 +67,8 @@ export abstract class Node {
     inputs: Input[] = [];
     outputs: Output[] = [];
 
+    linear: boolean = true; // set to false for things that have 2 signal outputs
+
     parentBlueprint: Blueprint | null = null;
 
     constructor() {
@@ -86,6 +88,8 @@ export abstract class Node {
 
         let inputValues: any = {};
 
+        var start = window.performance.now();
+
         for (let i = 0; i < this.inputs.length; i++) {
             let input = this.inputs[i];
 
@@ -97,13 +101,20 @@ export abstract class Node {
             if (this.parentBlueprint!.allConnections.some(connection => connection.input == input)) {
                 let connection = this.parentBlueprint!.allConnections.find(connection => connection.input == input)!;
                 let output = this.parentBlueprint!.runtime.getOutput(connection.output._id);
-                //console.log(connection)
-                inputValues[input.name] = output!.OutputValue;
+                if (output == null){
+                    console.error("Output not set!, Somthings wrong here!!!!!")
+                    inputValues[input.name] = null;
+                } else {
+                    inputValues[input.name] = output!.OutputValue;
+                }
             } else {
                 inputValues[input.name] = null;
             }
 
         }
+
+        var end = window.performance.now();
+        //console.log(`Rendered ${this.inputs.length} nodes, in ${end - start}ms`)
 
         return inputValues;
 
@@ -113,6 +124,7 @@ export abstract class Node {
 
         if (this.parentBlueprint == null) throw new Error("Node is not in a blueprint!");
         if (!this.outputs.some(output => output.name == Name)) throw new Error("Output with name '" + Name + "' does not exist!");
+
 
         this.parentBlueprint.runtime.setOutput(this.outputs.find(output => output.name == Name)!._id, Value);
 
@@ -149,4 +161,55 @@ export class StartNode extends Node {
     async run(runtime: Runtime): Promise<void> {
         this.setOutput("Signal", null);
     }
+}
+
+export class ForLoop extends Node {
+
+    name: string = "For Loop"
+    linear: boolean = false;
+
+    constructor() {
+        super();
+        this.inputs = [new Input("Signal", Types.Signal), new Input("Start", Types.Number), new Input("End", Types.Number)];
+        this.outputs = [new Output("Loop", Types.Signal), new Output("Index", Types.Number), new Output("End", Types.Signal)];
+    }
+
+    async run(runtime: Runtime): Promise<void> {
+
+        let inputs = this.getInputs();
+
+        let start = inputs["Start"];
+        let end = inputs["End"];
+
+        function CheckVal(i: number): boolean {
+            if (end > start) {
+                return i < end;
+            } else {
+                return i > end;
+            }
+        }
+
+        for (let i = start; CheckVal(i); end > start ? i++ : i--) {
+            let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[0])
+            if (conn == null) continue;
+            let LoopFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
+            this.setOutput("Index", i);
+            
+
+            let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(LoopFirstNode!);
+            if (exOrder == null) continue;
+            await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
+        }
+        this.setOutput("Index", end - 1);
+
+        let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[2])
+        if (conn == null) return;
+        let endFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
+        
+        let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(endFirstNode!);
+        if (exOrder == null) return;
+        await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
+    }
+
+
 }

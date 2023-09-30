@@ -1,5 +1,5 @@
 import { Blueprint } from "./bp/blueprint";
-import { Node, StartNode, Types, GenericNode } from "./bp/node";
+import { Node, StartNode, Types, GenericNode, ForLoop } from "./bp/node";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 import { Vector2 } from "./bp/generics";
@@ -81,6 +81,8 @@ testNode4.run = async () => {
 }
 bp.addNode(testNode4);
 
+let loop = new ForLoop();
+bp.addNode(loop);
 
 // when blueprint is run it will log 15!
 

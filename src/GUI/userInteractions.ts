@@ -300,8 +300,6 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
             //BlueprintCamera.Zoom *= 0.9;
         }
 
-        console.log(BlueprintCamera)
-
     })
 
 }

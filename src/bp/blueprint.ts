@@ -1,7 +1,7 @@
 import { Node, Connection, Types, Input, Output } from "./node"
 import { v4 as uuidv4 } from 'uuid';
 
-interface Dependency {}
+interface Dependency { }
 
 export class Blueprint {
 
@@ -63,12 +63,17 @@ export class Blueprint {
             // get all inputs that are connected to a node that we havent looked at yet
             let inputs = node.inputs.filter(input => CurrentBlueprint.allConnections.filter(connection => connection.input == input).some(connection => !LookedNodes.includes(CurrentBlueprint.allNodes.find(node => node.outputs.includes(connection.output))!)));
             await inputs.forEach(async (input, i) => {
-                let connection = CurrentBlueprint.allConnections.find(connection => connection.input == inputs[i])!;
-                let inputNode = CurrentBlueprint.allNodes.find(node => node.outputs.includes(connection.output))!;
-                await LookAtNode(inputNode);
+                if (input.type != Types.Signal) {
+                    let connection = CurrentBlueprint.allConnections.find(connection => connection.input == inputs[i])!;
+                    let inputNode = CurrentBlueprint.allNodes.find(node => node.outputs.includes(connection.output))!;
+                    if (inputNode.linear == false) return;
+                    await LookAtNode(inputNode);
+                }
             })
 
             ExicutionOrder.push(node);
+
+            if (node.linear == false) return;
 
             // get all outputs that are connected to the node
             node.outputs.forEach(async (output, i) => {
@@ -112,6 +117,7 @@ export class Blueprint {
             let node = ExicutionOrder[i];
             this.runtime.CurrentNode = node;
             await node.run(this.runtime);
+            //console.log("Ran node: " + node.name)
         }
 
     }
@@ -143,6 +149,10 @@ export class Runtime {
         return this.OutputResults.find(output => output.OutputID == id);
     }
     setOutput(id: string, value: any) {
+        if (this.OutputResults.some(output => output.OutputID == id)) {
+            this.OutputResults.find(output => output.OutputID == id)!.OutputValue = value;
+            return;
+        }
         this.OutputResults.push({ OutputID: id, OutputValue: value } as OutputResult);
     }
 
