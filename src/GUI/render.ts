@@ -13,6 +13,27 @@ function ResizeCanvas() {
 ResizeCanvas();
 window.addEventListener("resize", ResizeCanvas);
 
+const Images: any = {
+
+
+
+}
+function LoadImageFromURL(url: string, key: string) {
+
+    let img = new Image();
+    img.onload = () => {
+        Images[key] = img;
+    }
+    img.src = url;
+
+}
+
+LoadImageFromURL("./src/GUI/imgs/player-pause.svg", "pause");
+LoadImageFromURL("./src/GUI/imgs/player-play.svg", "play");
+LoadImageFromURL("./src/GUI/imgs/player-stop.svg", "stop");
+
+LoadImageFromURL("./src/GUI/imgs/InputOutput.svg", "plug");
+
 export function RenderBlueprint(bp: Blueprint) {
 
     // clear the canvas
@@ -21,6 +42,30 @@ export function RenderBlueprint(bp: Blueprint) {
     // render the background as a light grey
     ctx.fillStyle = "#5e5e5e";
     ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+
+    ctx.save();
+
+    // make the backgroud a infinite grid
+    ctx.translate(-(bp.Camera.Position.x) % 50, -(bp.Camera.Position.y) % 50);
+    ctx.scale(bp.Camera.Zoom, bp.Camera.Zoom);
+    ctx.strokeStyle = "#00000022";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = -5; i < Canvas.width / bp.Camera.Zoom / 50; i++) {
+        ctx.moveTo((i * 50), 0);
+        ctx.lineTo((i * 50), Canvas.height / bp.Camera.Zoom);
+    }
+    for (let i = -5; i < Canvas.height / bp.Camera.Zoom / 50; i++) {
+        ctx.moveTo(0, (i * 50));
+        ctx.lineTo(Canvas.width / bp.Camera.Zoom, (i * 50));
+    }
+    ctx.stroke();
+
+    ctx.restore();
+    ctx.save();
+
+    ctx.translate(-bp.Camera.Position.x, -bp.Camera.Position.y);
+    ctx.scale(bp.Camera.Zoom, bp.Camera.Zoom);
 
     // render all nodes
     bp.allNodes.forEach(node => {
@@ -32,12 +77,54 @@ export function RenderBlueprint(bp: Blueprint) {
         RenderConnection(connection, bp);
     })
 
+    ctx.restore();
+
     if (bp._isRunning) {
         // draw blue box around viewport
-        ctx.strokeStyle = "#0000ff";
-        ctx.lineWidth = 5;
-        ctx.strokeRect(bp.Camera.Position.x, bp.Camera.Position.y, Canvas.width / bp.Camera.Zoom, Canvas.height / bp.Camera.Zoom);
+        ctx.strokeStyle = "#A8E4EEbb";
+        ctx.lineWidth = 15;
+        ctx.strokeRect(0, 0, Canvas.width, Canvas.height);
     }
+
+    // render a small island at the top of the screen containing the name of the blueprint
+    ctx.fillStyle = "#00000077";
+    ctx.beginPath();
+    ctx.roundRect((Canvas.width / 2) - 100, 0, 200, 50, [0, 0, 10, 10]);
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "18px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(bp.name, Canvas.width / 2, 30);
+
+    // File Options Menu
+    ctx.fillStyle = "#00000077";
+    ctx.beginPath();
+    ctx.roundRect((Canvas.width / 2) + 100, 0, 100, 40, [0, 0, 10, 0]);
+    ctx.fill();
+
+    // Run Options Menu
+    ctx.fillStyle = "#00000077";
+    ctx.beginPath();
+    ctx.roundRect((Canvas.width / 2) - 100, 0, -100, 40, [0, 0, 10, 0]);
+    ctx.fill();
+
+    if (bp._isRunning) {
+
+        ctx.drawImage(Images.pause, (Canvas.width / 2) - 150, 5, 30, 30);
+        ctx.drawImage(Images.stop, (Canvas.width / 2) - (150 + 30), 5, 30, 30);
+
+    } else {
+
+        ctx.drawImage(Images.play, (Canvas.width / 2) - (150 + 15), 5, 30, 30);
+
+    }
+
+    // write in semi transparent text
+    ctx.fillStyle = "#ffffff77";
+    ctx.font = "24px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText(`${bp.Camera.Position.x}, ${bp.Camera.Position.y}`, Canvas.width - 10, Canvas.height - 10);
 
 }
 
@@ -79,14 +166,17 @@ export function RenderNode(node: Node) {
     ctx.arcTo(node._position.x, node._position.y + headerHeight + NodeHeight, node._position.x, node._position.y + headerHeight + NodeHeight - 10, 10);
     ctx.fill();
 
-
     // render inputs
     for (let i = 0; i < node.inputs.length; i++) {
         // draw a circle for each input
         ctx.fillStyle = TypeColors[node.inputs[i].type];
-        ctx.beginPath();
-        ctx.arc(node._position.x + 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
-        ctx.fill();
+        if (node.inputs[i].type != Types.Signal) {
+            ctx.beginPath();
+            ctx.arc(node._position.x + 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
+            ctx.fill();
+        } else {
+            ctx.drawImage(Images.plug, node._position.x + 1, node._position.y + headerHeight + 20 + (i * 20) - (25 / 2), 25, 25);
+        }
 
         // draw the input name
         ctx.fillStyle = "#ffff";
@@ -99,15 +189,30 @@ export function RenderNode(node: Node) {
     for (let i = 0; i < node.outputs.length; i++) {
         // draw a circle for each output
         ctx.fillStyle = TypeColors[node.outputs[i].type];
-        ctx.beginPath();
-        ctx.arc(node._position.x + NodeWidth - 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
-        ctx.fill();
+        if (node.outputs[i].type != Types.Signal) {
+            ctx.beginPath();
+            ctx.arc(node._position.x + NodeWidth - 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
+            ctx.fill();
+        } else {
+            ctx.drawImage(Images.plug, node._position.x + NodeWidth - 30, node._position.y + headerHeight + 20 + (i * 20) - (25 / 2), 25, 25);
+        }
 
         // draw the output name
         ctx.fillStyle = "#ffff";
         ctx.font = "14px Arial";
         ctx.textAlign = "right";
         ctx.fillText(node.outputs[i].name, node._position.x + NodeWidth - 30, node._position.y + headerHeight + 20 + (i * 20) + 5);
+    }
+
+    if (node.parentBlueprint?._isRunning && node.parentBlueprint.runtime.CurrentNode == node) {
+
+        ctx.strokeStyle = "#A8E4EEbb";
+        ctx.lineWidth = 5;
+        // round the end of the line
+        ctx.beginPath();
+        ctx.roundRect(node._position.x, node._position.y, NodeWidth, NodeHeight + 20, [10, 10, 10, 10]);
+        ctx.stroke();
+
     }
 
 }

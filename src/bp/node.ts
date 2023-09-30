@@ -7,16 +7,21 @@ export enum Types {
     Signal,
     Number,
     String,
-    Boolean
+    Boolean,
+    Array,
+    Vector2
 
 }
 
 export enum TypeColors {
 
     "#ffffff",
-    "#1CDEA7",
-    "#FD30CE",
-    "#8C0B01"
+    "#0AD2FF",
+    "#2962FF",
+    "#9500FF",
+    "#FF0059",
+    "#B4E600",
+    "#FF8C00"
 
 }
 
@@ -67,6 +72,7 @@ export abstract class Node {
     constructor() {
         this.inputs.push(new Input("Signal", Types.Signal));
         this.outputs.push(new Output("Signal", Types.Signal));
+        this._position = new Vector2(0, 0);
     }
 
     addInput(name: string, type: Types) {
@@ -83,10 +89,15 @@ export abstract class Node {
         for (let i = 0; i < this.inputs.length; i++) {
             let input = this.inputs[i];
 
+            if (input.type == Types.Signal) continue;
+
+            //console.log(input)
+
             // if has connection
             if (this.parentBlueprint!.allConnections.some(connection => connection.input == input)) {
                 let connection = this.parentBlueprint!.allConnections.find(connection => connection.input == input)!;
                 let output = this.parentBlueprint!.runtime.getOutput(connection.output._id);
+                //console.log(connection)
                 inputValues[input.name] = output!.OutputValue;
             } else {
                 inputValues[input.name] = null;
@@ -103,10 +114,7 @@ export abstract class Node {
         if (this.parentBlueprint == null) throw new Error("Node is not in a blueprint!");
         if (!this.outputs.some(output => output.name == Name)) throw new Error("Output with name '" + Name + "' does not exist!");
 
-        this.parentBlueprint!.runtime.OutputResults.push({
-            OutputID: this.outputs.find(output => output.name == Name)!._id,
-            OutputValue: Value
-        });
+        this.parentBlueprint.runtime.setOutput(this.outputs.find(output => output.name == Name)!._id, Value);
 
     }
 
@@ -138,7 +146,7 @@ export class StartNode extends Node {
         this.inputs = [];
         this.outputs = [new Output("Signal", Types.Signal)];
     }
-    run(runtime: Runtime): void {
+    async run(runtime: Runtime): Promise<void> {
         this.setOutput("Signal", null);
     }
 }

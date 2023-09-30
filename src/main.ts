@@ -15,12 +15,15 @@ constNumb.inputs = [];
 constNumb.outputs = [];
 constNumb.addOutput("10", Types.Number);
 constNumb.addOutput("5", Types.Number);
-constNumb.name = "Constant Number";
+constNumb.addOutput("1", Types.Number);
+constNumb.name = "Numbers";
+constNumb._width = 100;
 constNumb._position = new Vector2(100, 100); // not required if not using GUI
-constNumb.run = () => {
+constNumb.run = async () => {
 
     constNumb.setOutput("10", 10);
     constNumb.setOutput("5", 5);
+    constNumb.setOutput("1", 1);
 
 }
 bp.addNode(constNumb);
@@ -49,7 +52,7 @@ let testNode3 = new GenericNode();
 testNode3.addInput("Number", Types.Number);
 testNode3.name = "Log Number";
 testNode3._position = new Vector2(500, 100); // not required if not using GUI
-testNode3.run = () => {
+testNode3.run = async () => {
 
     let inputs: any = testNode3.getInputs()
 
@@ -57,15 +60,27 @@ testNode3.run = () => {
 
     console.log(number);
 
+    testNode4.setOutput("Signal", null);
+
 }
 bp.addNode(testNode3);
 
-bp.connectNodes(testNode3.inputs[0], StartingNode.outputs[0]); // starting to log
+let testNode4 = new GenericNode();
+testNode4.addInput("Number", Types.Number);
+testNode4.name = "Wait";
+testNode4._position = new Vector2(500, 100); // not required if not using GUI
+testNode4.run = async () => {
 
-bp.connectNodes(testNode2.inputs[0], constNumb.outputs[0]); // number 1
-bp.connectNodes(testNode2.inputs[1], constNumb.outputs[1]); // number 2
+    let inputs: any = testNode4.getInputs()
 
-bp.connectNodes(testNode3.inputs[1], testNode2.outputs[0]); // log number
+    let number = inputs["Number"];
+
+    testNode4.setOutput("Signal", null);
+    await new Promise(resolve => setTimeout(resolve, number*1000));
+
+}
+bp.addNode(testNode4);
+
 
 // when blueprint is run it will log 15!
 

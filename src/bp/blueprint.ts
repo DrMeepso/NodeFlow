@@ -1,6 +1,8 @@
 import { Node, Connection, Types, Input, Output } from "./node"
 import { v4 as uuidv4 } from 'uuid';
 
+interface Dependency {}
+
 export class Blueprint {
 
     name: string = "Blueprint <Generic>"
@@ -11,6 +13,7 @@ export class Blueprint {
     allConnections: Connection[] = [];
 
     runtime: Runtime = new Runtime();
+    dependencies: Dependency[] = [];
 
     // unused if no GUI is present
     Camera = {
@@ -107,6 +110,7 @@ export class Blueprint {
 
         for (let i = 0; i < ExicutionOrder.length; i++) {
             let node = ExicutionOrder[i];
+            this.runtime.CurrentNode = node;
             await node.run(this.runtime);
         }
 
@@ -124,6 +128,7 @@ interface OutputResult {
 export class Runtime {
 
     OutputResults: Array<OutputResult> = [];
+    CurrentNode: Node | null = null;
 
     constructor() {
 
@@ -131,10 +136,7 @@ export class Runtime {
 
     clearContext() {
         this.OutputResults = [];
-    }
-
-    runNode(node: Node) {
-        node.run(this);
+        this.CurrentNode = null;
     }
 
     getOutput(id: string) {

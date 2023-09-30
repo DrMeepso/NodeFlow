@@ -140,7 +140,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
     document.addEventListener("mousemove", (e) => {
 
         if (SelectedNode != null && MouseInput == MouseInputType.DraggingNode) {
-            SelectedNode._position = { x: e.x, y: e.y } as Vector2;
+            SelectedNode._position = { x: e.x + BlueprintCamera.Position.x, y: e.y + BlueprintCamera.Position.y } as Vector2;
         }
 
         if (MouseInput == MouseInputType.MovingCamera) {
@@ -257,6 +257,37 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
         }
 
+        const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
+
+        if (CurrentBlueprint._isRunning) {
+
+            let PausePos = new Vector2((Canvas.width / 2) - (150 - 15), 15);
+            let StopPos = new Vector2((Canvas.width / 2) - (150 + 15), 15);
+
+            if (Distance(MousePos, PausePos) < 15) {
+
+                //console.log("Pause");
+
+            } else if (Distance(MousePos, StopPos) < 15) {
+
+                //console.log("Stop");
+
+            }
+
+        } else {
+
+            let PlayPos = new Vector2((Canvas.width / 2) - (150), 15);
+
+            if (Distance(MousePos, PlayPos) < 15) {
+
+                //console.log("Play");
+
+                CurrentBlueprint.runBlueprint();
+
+            }
+
+        }
+
         SelectedNode = null;
 
     })
@@ -264,10 +295,12 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
     document.addEventListener("wheel", (e) => {
 
         if (e.deltaY > 0) {
-            BlueprintCamera.Zoom *= 1.1;
+            //BlueprintCamera.Zoom *= 1.1;
         } else {
-            BlueprintCamera.Zoom *= 0.9;
+            //BlueprintCamera.Zoom *= 0.9;
         }
+
+        console.log(BlueprintCamera)
 
     })
 
