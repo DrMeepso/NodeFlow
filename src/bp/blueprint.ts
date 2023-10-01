@@ -1,7 +1,22 @@
-import { Node, Connection, Types, Input, Output } from "./node"
+import { Vector2 } from "./generics";
+import { Node, Connection, Types, Input, Output, StartNode } from "./node"
 import { v4 as uuidv4 } from 'uuid';
 
 interface Dependency { }
+
+export class Variable {
+
+    name: string;
+    type: Types;
+    value: any;
+
+    constructor(name: string, type: Types, value: any) {
+        this.name = name;
+        this.type = type;
+        this.value = value;
+    }
+
+}
 
 export class Blueprint {
 
@@ -11,6 +26,8 @@ export class Blueprint {
 
     allNodes: Node[] = [];
     allConnections: Connection[] = [];
+
+    allVariables: Variable[] = [];
 
     runtime: Runtime = new Runtime();
     dependencies: Dependency[] = [];
@@ -24,6 +41,11 @@ export class Blueprint {
     constructor() {
 
         this.runtime.clearContext()
+
+        let StartingNode = new StartNode();
+        StartingNode._position = new Vector2(0, 0);
+        this.addNode(StartingNode);
+
 
     }
 
@@ -100,6 +122,7 @@ export class Blueprint {
         let ExicutionOrder = await this.getNodeExicutionOrder(this.allNodes.find(node => node.name == "Start")!);
 
         this.runtime.clearContext();
+        this.runtime.setAllVariables(this.allVariables);
 
         this._isRunning = true;
 
@@ -122,6 +145,20 @@ export class Blueprint {
 
     }
 
+    createVariable(name: string, type: Types, value: any): Variable {
+        if (this.allVariables.some(variable => variable.name == name)) {
+            throw new Error("Variable with name " + name + " already exists")
+        }
+        let vari = new Variable(name, type, value)
+        this.allVariables.push(vari);
+        console.log(this.allVariables)
+        return vari;
+    }
+
+    getVariable(name: string) {
+        return this.allVariables.find(variable => variable.name == name);
+    }
+
 }
 
 interface OutputResult {
@@ -136,13 +173,42 @@ export class Runtime {
     OutputResults: Array<OutputResult> = [];
     CurrentNode: Node | null = null;
 
+    CurrentVariables: Array<Variable> = [];
+
     constructor() {
 
     }
 
     clearContext() {
         this.OutputResults = [];
+        this.CurrentVariables = [];
         this.CurrentNode = null;
+    }
+
+    setAllVariables(variables: Variable[]) {
+
+        variables.forEach(variable => {
+
+            // if there is a better way of doing this please tell me!
+            let JSONReparsed = JSON.parse(JSON.stringify(variable));
+
+            let VariableClone = new Variable(JSONReparsed.name, JSONReparsed.type, JSONReparsed.value);
+            this.CurrentVariables.push(VariableClone);
+
+        })
+
+    }
+
+    getVariable(name: string) {
+        return this.CurrentVariables.find(variable => variable.name == name);
+    }
+
+    setVariable(name: string, value: any) {
+        if (this.CurrentVariables.some(variable => variable.name == name)) {
+            this.CurrentVariables.find(variable => variable.name == name)!.value = value;
+            return;
+        }
+        this.CurrentVariables.push({ name: name, type: Types.Any, value: value } as Variable);
     }
 
     getOutput(id: string) {

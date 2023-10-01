@@ -1,6 +1,11 @@
+/*
+This file is from a previous node project of mine
+It needs to be cleaned up and rewritten
+*/
+
 import { Blueprint } from "../bp/blueprint";
 import { Vector2 } from "../bp/generics";
-import { Node, Connection, Types, TypeColors } from "../bp/node";
+import { Node, Connection, Types, TypeColors, Input } from "../bp/node";
 
 const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = Canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -13,11 +18,7 @@ function ResizeCanvas() {
 ResizeCanvas();
 window.addEventListener("resize", ResizeCanvas);
 
-const Images: any = {
-
-
-
-}
+const Images: any = {}
 function LoadImageFromURL(url: string, key: string) {
 
     let img = new Image();
@@ -67,15 +68,53 @@ export function RenderBlueprint(bp: Blueprint) {
     ctx.translate(-bp.Camera.Position.x, -bp.Camera.Position.y);
     ctx.scale(bp.Camera.Zoom, bp.Camera.Zoom);
 
-    // render all nodes
-    bp.allNodes.forEach(node => {
-        RenderNode(node);
-    });
-
     // render all connections
     bp.allConnections.forEach(connection => {
         RenderConnection(connection, bp);
     })
+
+    // render the dragged connection
+    if (window.draggingInfo.isDragging) {
+
+        let inNode = window.draggingInfo.node;
+        let mousePos = window.mousePos;
+        mousePos = window.mousePos.add(bp.Camera.Position as Vector2)
+
+        let HoleList = window.draggingInfo.input ? inNode.inputs : inNode.outputs;
+        let Hole = HoleList[window.draggingInfo.index];
+
+        ctx.strokeStyle = TypeColors[Hole.type];
+        ctx.lineWidth = 5;
+
+        let x = inNode._position.x + 15;
+        if (!window.draggingInfo.input) x += inNode._width - 30;
+
+        let Start = { x: x, y: inNode._position.y + 40 + (window.draggingInfo.index * 20) } as Vector2;
+
+        ctx.beginPath();
+
+        // bezier curve
+        ctx.moveTo(Start.x, Start.y);
+        if (Start.x < mousePos.x) {
+            ctx.bezierCurveTo(Start.x + 50, Start.y, mousePos.x - 50, mousePos.y, mousePos.x, mousePos.y);
+        } else {
+            ctx.bezierCurveTo(Start.x - 50, Start.y, mousePos.x + 50, mousePos.y, mousePos.x, mousePos.y);
+        }
+
+        // round the end of the line
+        ctx.lineCap = "round";
+
+
+        ctx.stroke();
+
+
+
+    }
+
+    // render all nodes
+    bp.allNodes.forEach(node => {
+        RenderNode(node);
+    });
 
     ctx.restore();
 
@@ -171,11 +210,24 @@ export function RenderNode(node: Node) {
         // draw a circle for each input
         ctx.fillStyle = TypeColors[node.inputs[i].type];
         if (node.inputs[i].type != Types.Signal) {
-            ctx.beginPath();
-            ctx.arc(node._position.x + 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
-            ctx.fill();
+
+            if (node.inputs[i].type == Types.Any) {
+
+                // make circle a square
+                ctx.beginPath();
+                ctx.roundRect(node._position.x + 16 / 2, node._position.y + headerHeight + 20 + (i * 20) - 8, 16, 16, [5, 5, 5, 5]);
+                ctx.fill();
+
+            } else {
+
+                ctx.beginPath();
+                ctx.arc(node._position.x + 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
+                ctx.fill();
+
+            }
+
         } else {
-            ctx.drawImage(Images.plug, node._position.x + 1, node._position.y + headerHeight + 20 + (i * 20) - (25 / 2), 25, 25);
+            ctx.drawImage(Images.plug, node._position.x + 2, node._position.y + headerHeight + 20 + (i * 20) - (25 / 2), 25, 25);
         }
 
         // draw the input name
@@ -191,7 +243,7 @@ export function RenderNode(node: Node) {
         ctx.fillStyle = TypeColors[node.outputs[i].type];
         if (node.outputs[i].type != Types.Signal) {
             ctx.beginPath();
-            ctx.arc(node._position.x + NodeWidth - 15, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
+            ctx.arc(node._position.x + NodeWidth - 17, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
             ctx.fill();
         } else {
             ctx.drawImage(Images.plug, node._position.x + NodeWidth - 30, node._position.y + headerHeight + 20 + (i * 20) - (25 / 2), 25, 25);
@@ -242,8 +294,8 @@ export function RenderConnection(Conn: Connection, parentBlueprint: Blueprint) {
 
     // make the strokestyle a gradient between the 2 colors
     let gradient = ctx.createLinearGradient(Start.x, Start.y, End.x, End.y);
-    gradient.addColorStop(0, TypeColors[Conn.output.type]);
-    gradient.addColorStop(1, TypeColors[Conn.input.type]);
+    gradient.addColorStop(0, TypeColors[Conn.input.type]);
+    gradient.addColorStop(1, TypeColors[Conn.output.type]);
 
     ctx.strokeStyle = gradient;
 

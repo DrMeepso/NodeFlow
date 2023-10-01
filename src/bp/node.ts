@@ -1,5 +1,5 @@
 import { Vector2 } from "./generics";
-import { Blueprint, Runtime } from "./blueprint";
+import { Blueprint, Runtime, Variable } from "./blueprint";
 import { v4 as uuidv4 } from 'uuid';
 
 export enum Types {
@@ -9,7 +9,8 @@ export enum Types {
     String,
     Boolean,
     Array,
-    Vector2
+    Vector3,
+    Any
 
 }
 
@@ -211,5 +212,30 @@ export class ForLoop extends Node {
         await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
     }
 
+
+}
+
+export class GetVariable extends Node {
+
+    name: string = "Get Variable"
+
+    thisVariable: Variable;
+
+    constructor(variable: Variable) {
+        super();
+        this.inputs = [];
+        console.log(this.parentBlueprint)
+        this.outputs = [new Output("Value", variable.type)];
+        this.name = variable.name;
+        this.thisVariable = variable;
+    }
+
+    async run(runtime: Runtime): Promise<void> {
+
+        if (this.parentBlueprint?.allVariables.find(vari => vari.name == this.thisVariable.name) == null) throw new Error("Variable is not in blueprint!")
+
+        this.setOutput("Value", runtime.getVariable(this.thisVariable.name)?.value);
+
+    }
 
 }

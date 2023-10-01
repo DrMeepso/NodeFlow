@@ -1,3 +1,8 @@
+/*
+This file is from a previous node project of mine
+It needs to be cleaned up and rewritten
+*/
+
 import { Blueprint } from "../bp/blueprint";
 import { Vector2 } from "../bp/generics";
 import { Connection, Node, Types } from "../bp/node";
@@ -63,6 +68,11 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
                         MouseInput = MouseInputType.DraggingConnection;
 
+                        window.draggingInfo.isDragging = true;
+                        window.draggingInfo.node = node;
+                        window.draggingInfo.input = true;
+                        window.draggingInfo.index = i;
+
                     }
 
                 }
@@ -78,6 +88,11 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
                         SelectedNode = node;
 
                         MouseInput = MouseInputType.DraggingConnection;
+
+                        window.draggingInfo.isDragging = true;
+                        window.draggingInfo.node = node;
+                        window.draggingInfo.input = false;
+                        window.draggingInfo.index = i;
 
                     }
 
@@ -150,11 +165,16 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
         MousePos.x = e.x;
         MousePos.y = e.y;
+
+        window.mousePos = MousePos;
     })
 
     document.addEventListener("mouseup", (e) => {
 
         MouseInput = MouseInputType.None;
+
+        window.draggingInfo.isDragging = false;
+        window.draggingInfo.node = null;
 
         // check if we where holding a input / output if we were over a input / output
         if (SelectedInput != -1) {
@@ -168,7 +188,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
                     if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
 
                         // check if the types match
-                        if (node.outputs[i].type == SelectedNode!.inputs[SelectedInput].type) {
+                        if (node.outputs[i].type == SelectedNode!.inputs[SelectedInput].type || SelectedNode!.inputs[SelectedInput].type == Types.Any) {
 
                             let Input = SelectedNode!.inputs[SelectedInput];
                             let Output = node.outputs[i];
@@ -177,6 +197,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
                             NConnection.input = Input;
                             NConnection.output = Output;
+
 
                             // check if input is already connected
                             let Inputed = CurrentBlueprint.allConnections.filter(connection => connection.input == Input).length > 0;
@@ -217,7 +238,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
                     if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
 
                         // check if the types match
-                        if (node.inputs[i].type == SelectedNode!.outputs[SelectedOutput].type) {
+                        if (node.inputs[i].type == SelectedNode!.outputs[SelectedOutput].type || node.inputs[i].type == Types.Any) {
 
                             let Input = node.inputs[i];
                             let Output = SelectedNode!.outputs[SelectedOutput];
@@ -226,6 +247,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
                             NConnection.input = Input;
                             NConnection.output = Output;
+
 
                             // check if input is already connected
                             let Inputed = CurrentBlueprint.allConnections.filter(connection => connection.input == Input).length > 0;

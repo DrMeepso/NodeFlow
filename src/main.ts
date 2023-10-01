@@ -1,14 +1,10 @@
 import { Blueprint } from "./bp/blueprint";
-import { Node, StartNode, Types, GenericNode, ForLoop } from "./bp/node";
+import { Node, StartNode, Types, GenericNode, ForLoop, GetVariable } from "./bp/node";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 import { Vector2 } from "./bp/generics";
 
 const bp = new Blueprint();
-
-let StartingNode = new StartNode();
-StartingNode._position = new Vector2(0, 0); // not required if not using GUI
-bp.addNode(StartingNode);
 
 let constNumb = new GenericNode();
 constNumb.inputs = [];
@@ -49,16 +45,16 @@ testNode2.run = async () => {
 bp.addNode(testNode2);
 
 let testNode3 = new GenericNode();
-testNode3.addInput("Number", Types.Number);
-testNode3.name = "Log Number";
+testNode3.addInput("Value", Types.Any);
+testNode3.name = "Log";
 testNode3._position = new Vector2(500, 100); // not required if not using GUI
 testNode3.run = async () => {
 
     let inputs: any = testNode3.getInputs()
 
-    let number = inputs["Number"];
+    let value = inputs["Value"];
 
-    console.log(number);
+    console.log(value);
 
     testNode4.setOutput("Signal", null);
 
@@ -84,6 +80,12 @@ bp.addNode(testNode4);
 let loop = new ForLoop();
 bp.addNode(loop);
 
+let testVariable = bp.createVariable("Test Number", Types.Number, 0);
+
+let getVari = new GetVariable(testVariable);
+bp.addNode(getVari);
+
+
 // when blueprint is run it will log 15!
 
 SetupUserInteractions(bp);
@@ -99,17 +101,28 @@ declare global {
     interface Window {
         runExicutionOrder: () => void;
         runBlueprint: () => void;
+        draggingInfo: any;
+        mousePos: Vector2;
     }
 
 }
 
 window.runExicutionOrder = () => {
 
-    console.log(bp.getNodeExicutionOrder(StartingNode));
+    console.log(bp.runBlueprint());
 
 }
 window.runBlueprint = () => {
 
     bp.runBlueprint();
+
+}
+
+window.draggingInfo = {
+
+    isDragging: false,
+    node: null,
+    input: false,
+    index: 0
 
 }
