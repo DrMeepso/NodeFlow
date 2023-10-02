@@ -1,5 +1,5 @@
 import { Blueprint } from "./bp/blueprint";
-import { Node, StartNode, Types, GenericNode, ForLoop, GetVariable } from "./bp/node";
+import { Node, StartNode, Types, GenericNode, ForLoop, GetVariable, SetVariable } from "./bp/node";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 import { Vector2 } from "./bp/generics";
@@ -85,8 +85,12 @@ let testVariable = bp.createVariable("Test Number", Types.Number, 0);
 let getVari = new GetVariable(testVariable);
 bp.addNode(getVari);
 
+let vectorTestVariable = bp.createVariable("Vector Test", Types.Vector2, new Vector2(15, 15));
+let getVectorVari = new GetVariable(vectorTestVariable);
+bp.addNode(getVectorVari);
 
-// when blueprint is run it will log 15!
+let setVectorVari = new SetVariable(testVariable);
+bp.addNode(setVectorVari);
 
 SetupUserInteractions(bp);
 

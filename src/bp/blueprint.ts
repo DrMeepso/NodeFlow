@@ -192,7 +192,17 @@ export class Runtime {
             // if there is a better way of doing this please tell me!
             let JSONReparsed = JSON.parse(JSON.stringify(variable));
 
-            let VariableClone = new Variable(JSONReparsed.name, JSONReparsed.type, JSONReparsed.value);
+            let value: any
+
+            // check if variable value is a class
+            if (JSONReparsed.value instanceof Object) {
+                // copy the class
+                value = Object.assign(Object.create(Object.getPrototypeOf(JSONReparsed.value)), JSONReparsed.value);
+            } else {
+                value = JSONReparsed.value;
+            }
+
+            let VariableClone = new Variable(JSONReparsed.name, JSONReparsed.type, value);
             this.CurrentVariables.push(VariableClone);
 
         })

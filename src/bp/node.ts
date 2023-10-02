@@ -9,7 +9,7 @@ export enum Types {
     String,
     Boolean,
     Array,
-    Vector3,
+    Vector2,
     Any
 
 }
@@ -235,6 +235,38 @@ export class GetVariable extends Node {
         if (this.parentBlueprint?.allVariables.find(vari => vari.name == this.thisVariable.name) == null) throw new Error("Variable is not in blueprint!")
 
         this.setOutput("Value", runtime.getVariable(this.thisVariable.name)?.value);
+
+    }
+
+}
+
+export class SetVariable extends Node {
+
+    name: string = "Set Variable"
+
+    thisVariable: Variable;
+
+    constructor(variable: Variable) {
+        super();
+        this.inputs = [new Output("Signal", Types.Signal), new Input("Value", variable.type)];
+        this.outputs = [new Output("Signal", Types.Signal)];
+        this.name = variable.name;
+        this.thisVariable = variable;
+    }
+
+    async run(runtime: Runtime): Promise<void> {
+
+        if (this.parentBlueprint?.allVariables.find(vari => vari.name == this.thisVariable.name) == null) throw new Error("Variable is not in blueprint!")
+
+        let inputs = this.getInputs();
+
+        let value = inputs["Value"];
+
+        if (value == null) return;
+
+        runtime.setVariable(this.thisVariable.name, value);
+
+        this.setOutput("Signal", null);
 
     }
 
