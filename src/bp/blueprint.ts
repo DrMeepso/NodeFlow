@@ -31,6 +31,7 @@ export class Blueprint {
 
     runtime: Runtime = new Runtime();
     dependencies: Dependency[] = [];
+    isRunningOnServer: boolean = false;
 
     // unused if no GUI is present
     Camera = {
@@ -46,12 +47,26 @@ export class Blueprint {
         StartingNode._position = new Vector2(0, 0);
         this.addNode(StartingNode);
 
+        // detects node, dont know about dino
+        if (typeof window === 'undefined') {
+            this.isRunningOnServer = true;
+        }
 
     }
 
     addNode(node: Node) {
         this.allNodes.push(node);
         node.parentBlueprint = this
+    }
+
+    removeNode(node: Node) {
+
+        if (node instanceof StartNode) return;
+
+        this.allNodes = this.allNodes.filter(n => n != node);
+        let inputs = node.inputs
+        let outputs = node.outputs;
+        this.allConnections = this.allConnections.filter(connection => !inputs.includes(connection.input) && !outputs.includes(connection.output));
     }
 
     connectNodes(input: Input, output: Output) {
@@ -151,7 +166,6 @@ export class Blueprint {
         }
         let vari = new Variable(name, type, value)
         this.allVariables.push(vari);
-        console.log(this.allVariables)
         return vari;
     }
 
@@ -168,12 +182,36 @@ interface OutputResult {
 
 }
 
+export enum LogLevels {
+    Info,
+    Warning,
+    Error
+}
+
+export class Log implements Log {
+
+    LogValue: string;
+    LoggedNode: Node;
+    LoggedTime: number;
+    LoggedLevel: LogLevels = LogLevels.Info;
+
+    constructor(value: string, logLevel: LogLevels, node: Node) {
+        this.LogValue = value;
+        this.LoggedNode = node;
+        this.LoggedTime = Date.now();
+        this.LoggedLevel = logLevel;
+    }
+
+}
+
 export class Runtime {
 
     OutputResults: Array<OutputResult> = [];
     CurrentNode: Node | null = null;
 
     CurrentVariables: Array<Variable> = [];
+
+    RecordedLogs: Array<Log> = [];
 
     constructor() {
 
@@ -183,6 +221,7 @@ export class Runtime {
         this.OutputResults = [];
         this.CurrentVariables = [];
         this.CurrentNode = null;
+        this.RecordedLogs = [];
     }
 
     setAllVariables(variables: Variable[]) {

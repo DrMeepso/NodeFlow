@@ -35,6 +35,8 @@ LoadImageFromURL("./src/GUI/imgs/player-stop.svg", "stop");
 
 LoadImageFromURL("./src/GUI/imgs/InputOutput.svg", "plug");
 
+LoadImageFromURL("./src/GUI/imgs/trash-solid.svg", "trash");
+
 export function RenderBlueprint(bp: Blueprint) {
 
     // clear the canvas
@@ -47,18 +49,18 @@ export function RenderBlueprint(bp: Blueprint) {
     ctx.save();
 
     // make the backgroud a infinite grid
-    ctx.translate(-(bp.Camera.Position.x) % 50, -(bp.Camera.Position.y) % 50);
+    ctx.translate((-(bp.Camera.Position.x) % 50) - 50, (-(bp.Camera.Position.y) % 50) - 50);
     ctx.scale(bp.Camera.Zoom, bp.Camera.Zoom);
     ctx.strokeStyle = "#00000022";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let i = -5; i < Canvas.width / bp.Camera.Zoom / 50; i++) {
-        ctx.moveTo((i * 50), 0);
-        ctx.lineTo((i * 50), Canvas.height / bp.Camera.Zoom);
+    for (let x = 0; x < Canvas.width / bp.Camera.Zoom; x += 25) {
+        ctx.moveTo(x * 2, 0);
+        ctx.lineTo(x * 2, Canvas.height / bp.Camera.Zoom + 150);
     }
-    for (let i = -5; i < Canvas.height / bp.Camera.Zoom / 50; i++) {
-        ctx.moveTo(0, (i * 50));
-        ctx.lineTo(Canvas.width / bp.Camera.Zoom, (i * 50));
+    for (let y = 0; y < (Canvas.height / bp.Camera.Zoom) + 150; y += 25) {
+        ctx.moveTo(0, y * 2);
+        ctx.lineTo(Canvas.width / bp.Camera.Zoom + 150, y * 2);
     }
     ctx.stroke();
 
@@ -106,8 +108,6 @@ export function RenderBlueprint(bp: Blueprint) {
 
 
         ctx.stroke();
-
-
 
     }
 
@@ -165,6 +165,117 @@ export function RenderBlueprint(bp: Blueprint) {
     ctx.textAlign = "right";
     ctx.fillText(`${bp.Camera.Position.x}, ${bp.Camera.Position.y}`, Canvas.width - 10, Canvas.height - 10);
 
+    let TrashPos = new Vector2(Canvas.width - 50 + 25, 2 + 25);
+
+    if (window.draggingInfo.isDraggingNode) {
+
+        if (window.mousePos.distance(TrashPos) < 25) {
+
+            ctx.globalAlpha = 1;
+            ctx.drawImage(Images.trash, Canvas.width - 50, 2, 50, 50);
+            ctx.globalAlpha = 1;
+    
+        } else {
+
+            ctx.globalAlpha = 0.5;
+            ctx.drawImage(Images.trash, Canvas.width - 50, 2, 50, 50);
+            ctx.globalAlpha = 1;
+
+        }
+    }
+
+    // render logs
+    bp.runtime.RecordedLogs.slice().reverse().forEach((log, index) => {
+
+        let Y = (Canvas.height) - (index * 29);
+
+        ctx.fillStyle = "#00000077";
+        ctx.textAlign = "right";
+
+        ctx.beginPath();
+        ctx.roundRect(10, Y - 35, 200, 25, [5, 5, 5, 5]);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText(log.LogValue, 15, Y -15 - 2.5);
+
+
+    })
+
+
+    if (window.rightClickMenu.open) {
+
+        ctx.fillStyle = "#00000077";
+        ctx.beginPath();
+        ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y, 150, 300, [10, 10, 10, 10]);
+        ctx.fill();
+
+        // render search bar at the top
+        ctx.fillStyle = "#212121dd";
+        ctx.beginPath();
+        ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y, 150, 40, [10, 10, 0, 0]);
+        ctx.fill();
+
+        // if the search text is longer than the menu, trim it
+        let SearchText = window.rightClickMenu.search;
+        if (ctx.measureText(SearchText).width > 150) {
+            // show the last 10 characters of the search text
+            SearchText = SearchText.slice(SearchText.length - 15, SearchText.length);
+
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "18px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(SearchText, window.rightClickMenu.position.x + 75, window.rightClickMenu.position.y + 25);
+
+        const search: string = window.rightClickMenu.search.toLowerCase();
+
+        let RenderdNodes = [];
+        if (window.rightClickMenu.search.length == 0) {
+            RenderdNodes = window.rightClickMenu.nodes.slice(0, 10);
+        } else {
+            RenderdNodes = window.rightClickMenu.nodes.filter((node: Node) => node.name.toLowerCase().includes(search)).slice(0, 10);
+        }
+
+        for (let i = 0; i < RenderdNodes.length; i++) {
+
+            let node = RenderdNodes[i];
+
+            ctx.fillStyle = "#212121dd";
+            ctx.beginPath();
+            ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y + 41 + (i * 30), 150, 29, [5, 5, 5, 5]);
+            ctx.fill();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "14px Arial";
+            ctx.textAlign = "left";
+            ctx.fillText(node.name, window.rightClickMenu.position.x + 10, window.rightClickMenu.position.y + 40 + (i * 30) + 20);
+
+        }
+
+        if (RenderdNodes.length == 0) {
+
+            if (search == String(parseFloat(search))){
+
+                // show a button allowing the user to create a generic number node
+                ctx.fillStyle = "#212121dd";
+                ctx.beginPath();
+                ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y + 41, 150, 29, [5, 5, 5, 5]);
+                ctx.fill();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "14px Arial";
+                ctx.textAlign = "left";
+                ctx.fillText("Add As Constant", window.rightClickMenu.position.x + 10, window.rightClickMenu.position.y + 40 + 20);
+
+            }
+
+        }
+
+    }
 }
 
 export function RenderNode(node: Node) {
@@ -176,7 +287,7 @@ export function RenderNode(node: Node) {
     //let bottomPadding = 10;
 
     // render header
-    ctx.fillStyle = "#000000"
+    ctx.fillStyle = "#212121"
     // make top corners rounded
     ctx.beginPath();
     ctx.moveTo(node._position.x, node._position.y + 10);
@@ -294,8 +405,8 @@ export function RenderConnection(Conn: Connection, parentBlueprint: Blueprint) {
 
     // make the strokestyle a gradient between the 2 colors
     let gradient = ctx.createLinearGradient(Start.x, Start.y, End.x, End.y);
-    gradient.addColorStop(0, TypeColors[Conn.input.type]);
-    gradient.addColorStop(1, TypeColors[Conn.output.type]);
+    gradient.addColorStop(0.1, TypeColors[Conn.input.type]);
+    gradient.addColorStop(0.9, TypeColors[Conn.output.type]);
 
     ctx.strokeStyle = gradient;
 

@@ -1,6 +1,7 @@
 import { Vector2 } from "./generics";
 import { Blueprint, Runtime, Variable } from "./blueprint";
 import { v4 as uuidv4 } from 'uuid';
+import { LogLevels, Log } from "./blueprint";
 
 export enum Types {
 
@@ -72,10 +73,13 @@ export abstract class Node {
 
     parentBlueprint: Blueprint | null = null;
 
-    constructor() {
+    nodeCustomData: any // allow for info that may change a node to be saved, ie a variable reference
+
+    constructor(CustomData?: any) {
         this.inputs.push(new Input("Signal", Types.Signal));
         this.outputs.push(new Output("Signal", Types.Signal));
         this._position = new Vector2(0, 0);
+        this.nodeCustomData = CustomData;
     }
 
     addInput(name: string, type: Types) {
@@ -133,6 +137,10 @@ export abstract class Node {
 
     abstract run(runtime: Runtime): void;
     
+    log(message: any) {
+        this.parentBlueprint?.runtime.RecordedLogs.push(new Log(message, LogLevels.Info, this));
+    }
+
 }
 
 export class GenericNode extends Node {
@@ -164,57 +172,6 @@ export class StartNode extends Node {
     }
 }
 
-export class ForLoop extends Node {
-
-    name: string = "For Loop"
-    linear: boolean = false;
-
-    constructor() {
-        super();
-        this.inputs = [new Input("Signal", Types.Signal), new Input("Start", Types.Number), new Input("End", Types.Number)];
-        this.outputs = [new Output("Loop", Types.Signal), new Output("Index", Types.Number), new Output("End", Types.Signal)];
-    }
-
-    async run(runtime: Runtime): Promise<void> {
-
-        let inputs = this.getInputs();
-
-        let start = inputs["Start"];
-        let end = inputs["End"];
-
-        function CheckVal(i: number): boolean {
-            if (end > start) {
-                return i < end;
-            } else {
-                return i > end;
-            }
-        }
-
-        for (let i = start; CheckVal(i); end > start ? i++ : i--) {
-            let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[0])
-            if (conn == null) continue;
-            let LoopFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
-            this.setOutput("Index", i);
-            
-
-            let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(LoopFirstNode!);
-            if (exOrder == null) continue;
-            await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
-        }
-        this.setOutput("Index", end - 1);
-
-        let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[2])
-        if (conn == null) return;
-        let endFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
-        
-        let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(endFirstNode!);
-        if (exOrder == null) return;
-        await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
-    }
-
-
-}
-
 export class GetVariable extends Node {
 
     name: string = "Get Variable"
@@ -224,7 +181,6 @@ export class GetVariable extends Node {
     constructor(variable: Variable) {
         super();
         this.inputs = [];
-        console.log(this.parentBlueprint)
         this.outputs = [new Output("Value", variable.type)];
         this.name = variable.name;
         this.thisVariable = variable;

@@ -15,7 +15,7 @@ npm install
 To start the development server, run the following command:
 
 ```
-npm start
+npm run dev
 ```
 
 This will start a local development server using vite, where you can view and interact with the blueprint editor.
@@ -24,6 +24,7 @@ This will start a local development server using vite, where you can view and in
 
 All code in the src/bp folder is independent of the GUI and can be used in any project. The following code snippet shows how to create a blueprint and add nodes and connections to it:
 
+*code is outdated and unrelated lol*
 ```ts
 import { Blueprint } from "./bp/blueprint";
 import { Node, StartNode, Types } from "./bp/node";

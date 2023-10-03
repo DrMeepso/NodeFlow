@@ -1,3 +1,5 @@
+// classes that can be considerd generic in nature, not generic TS classes
+
 export class Vector2 {
 
     constructor(public x: number, public y: number) { }
@@ -16,6 +18,10 @@ export class Vector2 {
 
     div(vector: Vector2) {
         return new Vector2(this.x / vector.x, this.y / vector.y);
+    }
+
+    distance(vector: Vector2) {
+        return Math.sqrt(Math.pow(this.x - vector.x, 2) + Math.pow(this.y - vector.y, 2));
     }
 
     static zero = new Vector2(0, 0);
