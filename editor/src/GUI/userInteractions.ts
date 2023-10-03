@@ -3,9 +3,7 @@ This file is from a previous node project of mine
 It needs to be cleaned up and rewritten
 */
 
-import { Blueprint, Variable } from "../bp/blueprint";
-import { Vector2 } from "../bp/generics";
-import { Connection, GenericNode, GetVariable, Node, Output, SetVariable, Types } from "../bp/node";
+import { Blueprint, Node, GenericNode, Vector2, Output, Types, Connection } from "../../../core"
 
 function Distance(a: Vector2, b: Vector2) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))

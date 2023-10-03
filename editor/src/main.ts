@@ -1,25 +1,20 @@
-import { Blueprint } from "./bp/blueprint";
-import { Node, StartNode, Types, GenericNode, GetVariable, SetVariable } from "./bp/node";
+//import { Blueprint } from "./bp/blueprint";
+import { Node, StartNode, Types, GenericNode, Blueprint, Vector2, DefaultNodes } from "../../core/";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
-import { Vector2 } from "./bp/generics";
-
-import { ForLoop, Wait } from "./bp/nodes/controll";
-import { Equal, NotEqual } from "./bp/nodes/logic";
-import { Log } from "./bp/nodes/debug";
 
 const bp = new Blueprint();
 
 let testVariable = bp.createVariable("Test Number", Types.Number, 0);
 
-let getVari = new GetVariable(testVariable);
+let getVari = new DefaultNodes.Variables.GetVariable(testVariable);
 //bp.addNode(getVari);
 
 let vectorTestVariable = bp.createVariable("Vector Test", Types.Vector2, new Vector2(15, 15));
-let getVectorVari = new GetVariable(vectorTestVariable);
+let getVectorVari = new DefaultNodes.Variables.GetVariable(vectorTestVariable);
 //bp.addNode(getVectorVari);
 
-let setVectorVari = new SetVariable(testVariable);
+let setVectorVari = new DefaultNodes.Variables.SetVariable(testVariable);
 //bp.addNode(setVectorVari);
 
 
@@ -72,7 +67,7 @@ window.rightClickMenu = {
     search: "",
     catagotys: [],
     selectedCatagory: null,
-    nodes: [ForLoop, Equal, NotEqual, Wait, Log],
+    nodes: [DefaultNodes.Controll.ForLoop, DefaultNodes.Logic.Equal, DefaultNodes.Logic.NotEqual, DefaultNodes.Controll.Wait, DefaultNodes.Debug.Log],
 
     width: 150,
     height: 300,

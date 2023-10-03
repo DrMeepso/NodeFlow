@@ -48,9 +48,9 @@ export class Blueprint {
         this.addNode(StartingNode);
 
         // detects node, dont know about dino
-        if (typeof window === 'undefined') {
-            this.isRunningOnServer = true;
-        }
+        //if (typeof Window === 'undefined') {
+            //this.isRunningOnServer = true;
+        //}
 
     }
 

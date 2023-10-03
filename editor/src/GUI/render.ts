@@ -3,9 +3,7 @@ This file is from a previous node project of mine
 It needs to be cleaned up and rewritten
 */
 
-import { Blueprint } from "../bp/blueprint";
-import { Vector2 } from "../bp/generics";
-import { Node, Connection, Types, TypeColors, Input } from "../bp/node";
+import { Blueprint, Vector2, Node, Connection, Types, TypeColors, Input } from "../../../core"
 
 const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = Canvas.getContext("2d") as CanvasRenderingContext2D;

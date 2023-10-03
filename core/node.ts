@@ -93,7 +93,7 @@ export abstract class Node {
 
         let inputValues: any = {};
 
-        var start = window.performance.now();
+        //var start = window.performance.now();
 
         for (let i = 0; i < this.inputs.length; i++) {
             let input = this.inputs[i];
@@ -118,7 +118,7 @@ export abstract class Node {
 
         }
 
-        var end = window.performance.now();
+        //var end = window.performance.now();
         //console.log(`Rendered ${this.inputs.length} nodes, in ${end - start}ms`)
 
         return inputValues;
