@@ -1,9 +1,27 @@
+import Logs from './Svelte/Logs.svelte'
+import { writable } from 'svelte/store'
+
+//export default app
+
 //import { Blueprint } from "./bp/blueprint";
-import { Node, StartNode, Types, GenericNode, Blueprint, Vector2, DefaultNodes } from "../../core/";
+import { Node, StartNode, Types, GenericNode, Blueprint, Vector2, DefaultNodes, Log } from "../../core/";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 
+const test: Log[] = []
 const bp = new Blueprint();
+bp.runtime.lissenForLog((log?: Log) => {
+    logs.$set({ logs: bp.runtime.RecordedLogs })
+})
+
+const logs = new Logs({
+    target: document.getElementById('logs'),
+    props: {
+        height: 100,
+        CurrentBlueprint: bp,
+        logs: bp.runtime.RecordedLogs
+    }
+})
 
 let testVariable = bp.createVariable("Test Number", Types.Number, 0);
 
@@ -16,7 +34,6 @@ let getVectorVari = new DefaultNodes.Variables.GetVariable(vectorTestVariable);
 
 let setVectorVari = new DefaultNodes.Variables.SetVariable(testVariable);
 //bp.addNode(setVectorVari);
-
 
 SetupUserInteractions(bp);
 

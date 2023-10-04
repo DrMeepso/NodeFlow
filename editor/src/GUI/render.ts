@@ -10,8 +10,8 @@ const ctx = Canvas.getContext("2d") as CanvasRenderingContext2D;
 
 // This shouldnt work but it does so im not complaining
 function ResizeCanvas() {
-    Canvas.width = window.innerWidth;
-    Canvas.height = window.innerHeight;
+    Canvas.width = Canvas.clientWidth;
+    Canvas.height = Canvas.clientHeight;
 }
 ResizeCanvas();
 window.addEventListener("resize", ResizeCanvas);
@@ -36,6 +36,8 @@ LoadImageFromURL("./src/GUI/imgs/InputOutput.svg", "plug");
 LoadImageFromURL("./src/GUI/imgs/trash-solid.svg", "trash");
 
 export function RenderBlueprint(bp: Blueprint) {
+
+    ResizeCanvas();
 
     // clear the canvas
     ctx.clearRect(0, 0, Canvas.width, Canvas.height);
@@ -181,27 +183,6 @@ export function RenderBlueprint(bp: Blueprint) {
 
         }
     }
-
-    // render logs
-    bp.runtime.RecordedLogs.slice().reverse().forEach((log, index) => {
-
-        let Y = (Canvas.height) - (index * 29);
-
-        ctx.fillStyle = "#00000077";
-        ctx.textAlign = "right";
-
-        ctx.beginPath();
-        ctx.roundRect(10, Y - 35, 200, 25, [5, 5, 5, 5]);
-        ctx.fill();
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "14px Arial";
-        ctx.textAlign = "left";
-        ctx.fillText(log.LogValue, 15, Y -15 - 2.5);
-
-
-    })
-
 
     if (window.rightClickMenu.open) {
 

@@ -35,7 +35,7 @@ export class Blueprint {
 
     // unused if no GUI is present
     Camera = {
-        Position: { x: 0, y: 0 },
+        Position: { x: 0, y: 0 } as Vector2,
         Zoom: 1
     }
 
@@ -217,11 +217,15 @@ export class Runtime {
 
     }
 
+    callBacks: Array<(log?: Log) => void> = [];
     clearContext() {
         this.OutputResults = [];
         this.CurrentVariables = [];
         this.CurrentNode = null;
         this.RecordedLogs = [];
+
+        this.callBacks.forEach(cb => cb());
+
     }
 
     setAllVariables(variables: Variable[]) {
@@ -269,6 +273,18 @@ export class Runtime {
             return;
         }
         this.OutputResults.push({ OutputID: id, OutputValue: value } as OutputResult);
+    }
+
+    log(value: string, logLevel: LogLevels = LogLevels.Info, node: Node) {
+        let log = new Log(value, logLevel, node)
+        this.RecordedLogs = [...this.RecordedLogs, log]
+        this.callBacks.forEach(cb => cb(log));
+    }
+
+    lissenForLog(cb: (log?: Log) => void) {
+
+        this.callBacks.push(cb);
+
     }
 
 }

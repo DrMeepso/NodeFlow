@@ -138,7 +138,7 @@ export abstract class Node {
     abstract run(runtime: Runtime): void;
     
     log(message: any) {
-        this.parentBlueprint?.runtime.RecordedLogs.push(new Log(message, LogLevels.Info, this));
+        this.parentBlueprint?.runtime.log(message, LogLevels.Info, this);
     }
 
 }

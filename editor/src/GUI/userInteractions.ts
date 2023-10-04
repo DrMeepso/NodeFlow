@@ -29,11 +29,13 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
     var SelectedInput: number = -1;
     var SelectedOutput: number = -1;
 
-    document.oncontextmenu = function () {
+    const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
+
+    Canvas.oncontextmenu = function () {
         return false;
     }
 
-    document.addEventListener("mousedown", (e) => {
+    Canvas.addEventListener("mousedown", (e) => {
 
         e.preventDefault();
 
@@ -250,7 +252,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
     })
 
-    document.addEventListener("mousemove", (e) => {
+    Canvas.addEventListener("mousemove", (e) => {
 
         if (SelectedNode != null && MouseInput == MouseInputType.DraggingNode) {
             SelectedNode._position = { x: e.x + BlueprintCamera.Position.x, y: e.y + BlueprintCamera.Position.y } as Vector2;
@@ -267,7 +269,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
         window.mousePos = MousePos;
     })
 
-    document.addEventListener("mouseup", (e) => {
+    Canvas.addEventListener("mouseup", (e) => {
 
         MouseInput = MouseInputType.None;
 
@@ -425,7 +427,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
     })
 
-    document.addEventListener("wheel", (e) => {
+    Canvas.addEventListener("wheel", (e) => {
 
         if (e.deltaY > 0) {
             //BlueprintCamera.Zoom *= 1.1;
@@ -453,7 +455,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
 
                 let NewNode = new WantedNode()
-                NewNode._position = window.rightClickMenu.position;
+                NewNode._position = window.rightClickMenu.position as Vector2
 
                 CurrentBlueprint.addNode(NewNode);
 

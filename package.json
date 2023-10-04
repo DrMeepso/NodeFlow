@@ -17,7 +17,6 @@
     "uuid": "^9.0.1"
   },
   "workspaces": [
-    "core",
-    "editor"
+    "core"
   ]
 }
