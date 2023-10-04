@@ -184,7 +184,7 @@ export function RenderBlueprint(bp: Blueprint) {
         }
     }
 
-    if (window.rightClickMenu.open) {
+    if (false) {
 
         ctx.fillStyle = "#00000077";
         ctx.beginPath();

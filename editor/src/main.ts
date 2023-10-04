@@ -1,4 +1,5 @@
 import Logs from './Svelte/Logs.svelte'
+import ContextMenu from './Svelte/ContextMenu.svelte';
 import { writable } from 'svelte/store'
 
 //export default app
@@ -15,7 +16,7 @@ bp.runtime.lissenForLog((log?: Log) => {
 })
 
 const logs = new Logs({
-    target: document.getElementById('logs'),
+    target: document.getElementById('logs')!,
     props: {
         height: 100,
         CurrentBlueprint: bp,
@@ -23,8 +24,18 @@ const logs = new Logs({
     }
 })
 
+const context = new ContextMenu({
+
+    target: document.body,
+    props: {
+        CurrentBlueprint: bp,
+    }
+
+})
+
 let testVariable = bp.createVariable("Test Number", Types.Number, 0);
 
+/*
 let getVari = new DefaultNodes.Variables.GetVariable(testVariable);
 //bp.addNode(getVari);
 
@@ -34,6 +45,7 @@ let getVectorVari = new DefaultNodes.Variables.GetVariable(vectorTestVariable);
 
 let setVectorVari = new DefaultNodes.Variables.SetVariable(testVariable);
 //bp.addNode(setVectorVari);
+*/
 
 SetupUserInteractions(bp);
 
@@ -84,7 +96,7 @@ window.rightClickMenu = {
     search: "",
     catagotys: [],
     selectedCatagory: null,
-    nodes: [DefaultNodes.Controll.ForLoop, DefaultNodes.Controll.IfStatement ,DefaultNodes.Logic.Equal, DefaultNodes.Logic.NotEqual, DefaultNodes.Controll.Wait, DefaultNodes.Debug.Log],
+    nodes: [],
 
     width: 150,
     height: 300,

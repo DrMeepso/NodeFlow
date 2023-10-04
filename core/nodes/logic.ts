@@ -1,7 +1,7 @@
 import { Node, Input, Output, Types } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
-export class Equal extends Node {
+class Equal extends Node {
 
     name: string = "=="
 
@@ -24,7 +24,7 @@ export class Equal extends Node {
 
 }
 
-export class NotEqual extends Equal {
+class NotEqual extends Equal {
 
     name: string = "!="
 
@@ -42,5 +42,22 @@ export class NotEqual extends Equal {
         this.setOutput("Bool", value1 !== value2);
 
     }
+
+}
+
+export default {
+
+    name: "Logic",
+    category: "Core",
+    description: "Logic nodes",
+    id: "logic",
+    colour: "#ff0000",
+
+    nodes: [
+
+        { name: "==", node: Equal },
+        { name: "!=", node: NotEqual },
+
+    ]
 
 }

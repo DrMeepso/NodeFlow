@@ -1,7 +1,7 @@
 import { Node, Input, Output, Types } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
-export class Log extends Node {
+class Log extends Node {
 
     name: string = "Log"
 
@@ -21,5 +21,21 @@ export class Log extends Node {
 
     }
 
+
+}
+
+export default {
+
+    name: "Debug",
+    category: "Core",
+    description: "Debug nodes",
+    id: "debug",
+    colour: "#ff0000",
+
+    nodes: [
+
+        { name: "Log", node: Log },
+
+    ]
 
 }

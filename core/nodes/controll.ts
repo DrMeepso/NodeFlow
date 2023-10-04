@@ -2,7 +2,7 @@
 import { Node, Input, Output, Types } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
-export class ForLoop extends Node {
+class ForLoop extends Node {
 
     name: string = "For Loop"
     linear: boolean = false;
@@ -60,7 +60,7 @@ export class ForLoop extends Node {
 
 }
 
-export class IfStatement extends Node {
+class IfStatement extends Node {
 
     name: string = "If Statement"
     linear: boolean = false;
@@ -103,7 +103,7 @@ export class IfStatement extends Node {
 
 }
 
-export class Wait extends Node {
+class Wait extends Node {
 
     name: string = "Wait"
 
@@ -123,5 +123,23 @@ export class Wait extends Node {
         await new Promise(resolve => setTimeout(resolve, time * 1000));
 
     }
+
+}
+
+export default {
+
+    name: "Control",
+    category: "Core",
+    description: "Control nodes",
+    id: "control",
+    colour: "#ff0000",
+
+    nodes: [
+
+        { name: "For Loop", node: ForLoop },
+        { name: "If Statement", node: IfStatement },
+        { name: "Wait", node: Wait },
+
+    ]
 
 }

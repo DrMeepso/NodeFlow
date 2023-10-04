@@ -31,10 +31,6 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
     const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
-    Canvas.oncontextmenu = function () {
-        return false;
-    }
-
     Canvas.addEventListener("mousedown", (e) => {
 
         e.preventDefault();
@@ -45,7 +41,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
             let HasDoneSomething = false;
 
-            if (window.rightClickMenu.open) {
+            if (false) {
 
                 let Pos = window.rightClickMenu.position;
                 let Size = new Vector2(window.rightClickMenu.width, window.rightClickMenu.height);
