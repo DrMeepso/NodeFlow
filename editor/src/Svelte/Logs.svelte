@@ -131,7 +131,9 @@
 
     <div id="LogHeader">
         <p>Logs</p>
-        <p on:click={clearLogs}>({logs.length}) Clear</p>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <p on:click={clearLogs} style="cursor: pointer">({logs.length}) Clear</p>
     </div>
 
     {#if logs.length === 0}
@@ -178,7 +180,7 @@
 
         gap: 2px;
 
-        height: calc(100% - 40px);
+        height: calc(100% - 45px);
 
     }
 

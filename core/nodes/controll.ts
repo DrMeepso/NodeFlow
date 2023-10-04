@@ -60,6 +60,49 @@ export class ForLoop extends Node {
 
 }
 
+export class IfStatement extends Node {
+
+    name: string = "If Statement"
+    linear: boolean = false;
+
+    constructor() {
+        super();
+        this.inputs = [new Input("Signal", Types.Signal), new Input("Condition", Types.Boolean)];
+        this.outputs = [new Output("True", Types.Signal), new Output("False", Types.Signal)];
+    }
+
+    async run(runtime: Runtime): Promise<void> {
+
+        let inputs = this.getInputs();
+
+        let condition = inputs["Condition"];
+
+        if (condition) {
+
+            let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[0])
+            if (conn == null) return;
+            let trueFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
+
+            let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(trueFirstNode!);
+            if (exOrder == null) return;
+            await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
+
+        } else {
+
+            let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[1])
+            if (conn == null) return;
+            let falseFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
+
+            let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(falseFirstNode!);
+            if (exOrder == null) return;
+            await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
+
+        }
+
+    }
+
+}
+
 export class Wait extends Node {
 
     name: string = "Wait"

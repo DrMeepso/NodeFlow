@@ -84,7 +84,7 @@ window.rightClickMenu = {
     search: "",
     catagotys: [],
     selectedCatagory: null,
-    nodes: [DefaultNodes.Controll.ForLoop, DefaultNodes.Logic.Equal, DefaultNodes.Logic.NotEqual, DefaultNodes.Controll.Wait, DefaultNodes.Debug.Log],
+    nodes: [DefaultNodes.Controll.ForLoop, DefaultNodes.Controll.IfStatement ,DefaultNodes.Logic.Equal, DefaultNodes.Logic.NotEqual, DefaultNodes.Controll.Wait, DefaultNodes.Debug.Log],
 
     width: 150,
     height: 300,
