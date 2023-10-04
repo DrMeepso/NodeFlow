@@ -28,23 +28,31 @@ export class ForLoop extends Node {
             }
         }
 
-        for (let i = start; CheckVal(i); end > start ? i++ : i--) {
-            let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[0])
-            if (conn == null) continue;
-            let LoopFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
-            this.setOutput("Index", i);
-            
+        if (end !== start) {
 
-            let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(LoopFirstNode!);
-            if (exOrder == null) continue;
-            await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
+            for (let i = start; CheckVal(i); end > start ? i++ : i--) {
+                let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[0])
+                if (conn == null) continue;
+                let LoopFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
+                this.setOutput("Index", i);
+
+
+                let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(LoopFirstNode!);
+                if (exOrder == null) continue;
+                await this.parentBlueprint?.runThoughExicutionOrder(exOrder);
+            }
+            this.setOutput("Index", end - 1);
+
+        } else {
+
+            this.warn("Start & End values are the same! the code hasnt been run!")
+
         }
-        this.setOutput("Index", end - 1);
 
         let conn = this.parentBlueprint!.allConnections.find(connection => connection.output == this.outputs[2])
         if (conn == null) return;
         let endFirstNode = this.parentBlueprint?.getNodesFromConnection(conn)?.In;
-        
+
         let exOrder = await this.parentBlueprint?.getNodeExicutionOrder(endFirstNode!);
         if (exOrder == null) return;
         await this.parentBlueprint?.runThoughExicutionOrder(exOrder);

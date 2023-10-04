@@ -163,7 +163,7 @@ export function RenderBlueprint(bp: Blueprint) {
     ctx.fillStyle = "#ffffff77";
     ctx.font = "24px Arial";
     ctx.textAlign = "right";
-    ctx.fillText(`${bp.Camera.Position.x}, ${bp.Camera.Position.y}`, Canvas.width - 10, Canvas.height - 10);
+    ctx.fillText(`${Math.round(bp.Camera.Position.x)}, ${Math.round(bp.Camera.Position.y)}`, Canvas.width - 10, Canvas.height - 10);
 
     let TrashPos = new Vector2(Canvas.width - 50 + 25, 2 + 25);
 

@@ -141,6 +141,14 @@ export abstract class Node {
         this.parentBlueprint?.runtime.log(message, LogLevels.Info, this);
     }
 
+    warn(message: any) {
+        this.parentBlueprint?.runtime.log(message, LogLevels.Warning, this);
+    }
+
+    error(message: any) {
+        this.parentBlueprint?.runtime.log(message, LogLevels.Error, this);
+    }
+
 }
 
 export class GenericNode extends Node {
