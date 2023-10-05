@@ -7,7 +7,9 @@
 
     // import nodes from files
     import * as AllNodeClases from "../../../core/nodes/index"
-    import { Vector2, Node, Blueprint, GenericNode } from "../../../core";
+    import { Vector2, Node, Blueprint, GenericNode, Types, Constant } from "../../../core";
+
+    import { GetMouseCollitions } from "../GUI/render";
 
     import Icon from '@iconify/svelte';
 
@@ -54,9 +56,11 @@
 
         e.preventDefault()
 
+        if (GetMouseCollitions(CurrentBlueprint).find(e => e.type == 2 || e.type == 3)) return
+
         visible = true
 
-        IsSelectedingCatagory = true
+        //IsSelectedingCatagory = true
         position.x = e.clientX
         position.y = e.clientY
 
@@ -65,6 +69,9 @@
         let mainHolder = document.getElementById("MainHolder")
         mainHolder!.style.left = position.x + "px"
         mainHolder!.style.top = position.y + "px"
+
+        let Search = document.getElementById("Search")
+        Search?.focus()
 
     }
 
@@ -77,7 +84,7 @@
 
     let canvas = document.getElementById("canvas")
     canvas!.oncontextmenu = Context
-    canvas!.onclick = onClick
+    canvas!.onmousedown = onClick
 
     function CatagorySelected(thisCatagory: Catagory): () => void {
 
@@ -129,6 +136,8 @@
 
             isSeraching = true
 
+            console.log(WantsToCreateConstant())
+
             if (IsSelectedingCatagory) {
 
                 RenderedNodes = []
@@ -157,11 +166,81 @@
 
     }
 
+    function WantsToCreateConstant(): Types {
+
+        // check for numbers
+        if (SearchValue === String(parseFloat(SearchValue))){
+            return Types.Number
+        }
+
+        // check for booleans
+        if (SearchValue.toLowerCase() == "true" || SearchValue.toLowerCase() == "false"){
+            return Types.Boolean
+        }
+
+        // check for vector2
+        if (SearchValue.includes(",")){
+
+            let split = SearchValue.split(",")
+
+            if (split.length == 2){
+
+                if (split[0] === String(parseFloat(split[0])) && split[1] === String(parseFloat(split[1]))){
+                    return Types.Vector2
+                }
+
+            }
+
+        }
+
+        return Types.String
+
+    }
+
+    function GetConstantValue(): any {
+
+        switch (WantsToCreateConstant()){
+
+            case Types.Number:
+                return parseFloat(SearchValue)
+
+            case Types.Boolean:
+                return SearchValue.toLowerCase() == "true"
+
+            case Types.Vector2:
+                let split = SearchValue.split(",")
+                return new Vector2(parseFloat(split[0]), parseFloat(split[1]))
+
+            case Types.String:
+                return SearchValue
+
+        }
+
+    }
+
+    function MakeConstantNode(){
+
+        let Info = {
+            type: WantsToCreateConstant(),
+            value: GetConstantValue()
+        }
+
+        let ThisConst = new Constant(Info)
+
+        let pos = new Vector2(CxtMenuPos.x + CurrentBlueprint.Camera.Position.x, CxtMenuPos.y + CurrentBlueprint.Camera.Position.y)
+        ThisConst._position = pos
+
+        CurrentBlueprint.addNode(ThisConst)
+
+        visible = false
+
+    }
+
 </script>
 
 <div id="MainHolder" style="display: {visible ? "block" : "none"};">
 
-    <input type="text" placeholder="Search" bind:value={SearchValue} />
+    <input id="Search" type="text" placeholder="Search" bind:value={SearchValue} />
 
     <div id="Resalts">
         {#if IsSelectedingCatagory && !isSeraching }
@@ -193,7 +272,15 @@
                 <hr>
             {/each}
 
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         {:else if isSeraching}
+
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div class="CatHolder" on:click={MakeConstantNode}>
+                <p>Spawn Constant</p>
+            </div>
+            <hr>
 
             {#each RenderedNodes as ThisNode}
                 <!-- svelte-ignore a11y-no-static-element-interactions -->

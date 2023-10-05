@@ -180,7 +180,7 @@
 
         gap: 2px;
 
-        height: calc(100% - 45px);
+        height: calc(100% - 40px);
 
     }
 

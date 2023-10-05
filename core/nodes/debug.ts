@@ -7,7 +7,7 @@ class Log extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Output("Signal", Types.Signal), new Input("Value", Types.Any)];
+        this.inputs = [new Input("Signal", Types.Signal), new Input("Value", Types.Any)];
         this.outputs = [new Output("Signal", Types.Signal)];
     }
 
@@ -16,6 +16,8 @@ class Log extends Node {
         let inputs = this.getInputs();
 
         let value = inputs["Value"];
+        typeof inputs["Value"] == "object" ? value = JSON.stringify(value) : value = value;
+        typeof inputs["Value"] == "string" ? value = `"${value}"` : value = value.toString();
 
         this.log(value);
 

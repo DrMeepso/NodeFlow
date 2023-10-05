@@ -3,7 +3,7 @@ This file is from a previous node project of mine
 It needs to be cleaned up and rewritten
 */
 
-import { Blueprint, Vector2, Node, Connection, Types, TypeColors, Input } from "../../../core"
+import { Blueprint, Vector2, Node, Connection, Types, TypeColors, Input, Output } from "../../../core"
 
 const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = Canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -174,7 +174,7 @@ export function RenderBlueprint(bp: Blueprint) {
             ctx.globalAlpha = 1;
             ctx.drawImage(Images.trash, Canvas.width - 50, 2, 50, 50);
             ctx.globalAlpha = 1;
-    
+
         } else {
 
             ctx.globalAlpha = 0.5;
@@ -184,77 +184,6 @@ export function RenderBlueprint(bp: Blueprint) {
         }
     }
 
-    if (false) {
-
-        ctx.fillStyle = "#00000077";
-        ctx.beginPath();
-        ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y, 150, 300, [10, 10, 10, 10]);
-        ctx.fill();
-
-        // render search bar at the top
-        ctx.fillStyle = "#212121dd";
-        ctx.beginPath();
-        ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y, 150, 40, [10, 10, 0, 0]);
-        ctx.fill();
-
-        // if the search text is longer than the menu, trim it
-        let SearchText = window.rightClickMenu.search;
-        if (ctx.measureText(SearchText).width > 150) {
-            // show the last 10 characters of the search text
-            SearchText = SearchText.slice(SearchText.length - 15, SearchText.length);
-
-        }
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "18px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(SearchText, window.rightClickMenu.position.x + 75, window.rightClickMenu.position.y + 25);
-
-        const search: string = window.rightClickMenu.search.toLowerCase();
-
-        let RenderdNodes = [];
-        if (window.rightClickMenu.search.length == 0) {
-            RenderdNodes = window.rightClickMenu.nodes.slice(0, 10);
-        } else {
-            RenderdNodes = window.rightClickMenu.nodes.filter((node: Node) => node.name.toLowerCase().includes(search)).slice(0, 10);
-        }
-
-        for (let i = 0; i < RenderdNodes.length; i++) {
-
-            let node = RenderdNodes[i];
-
-            ctx.fillStyle = "#212121dd";
-            ctx.beginPath();
-            ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y + 41 + (i * 30), 150, 29, [5, 5, 5, 5]);
-            ctx.fill();
-
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "14px Arial";
-            ctx.textAlign = "left";
-            ctx.fillText(node.name, window.rightClickMenu.position.x + 10, window.rightClickMenu.position.y + 40 + (i * 30) + 20);
-
-        }
-
-        if (RenderdNodes.length == 0) {
-
-            if (search == String(parseFloat(search))){
-
-                // show a button allowing the user to create a generic number node
-                ctx.fillStyle = "#212121dd";
-                ctx.beginPath();
-                ctx.roundRect(window.rightClickMenu.position.x, window.rightClickMenu.position.y + 41, 150, 29, [5, 5, 5, 5]);
-                ctx.fill();
-
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "14px Arial";
-                ctx.textAlign = "left";
-                ctx.fillText("Add As Constant", window.rightClickMenu.position.x + 10, window.rightClickMenu.position.y + 40 + 20);
-
-            }
-
-        }
-
-    }
 }
 
 export function RenderNode(node: Node) {
@@ -359,7 +288,6 @@ export function RenderNode(node: Node) {
 
 }
 
-
 export function RenderConnection(Conn: Connection, parentBlueprint: Blueprint) {
 
     // use a bezier curve to draw the connection
@@ -405,4 +333,99 @@ export function GetCTX(): CanvasRenderingContext2D {
 }
 export function GetCanvas(): HTMLCanvasElement {
     return Canvas;
+}
+
+enum MouseCollitionTypes {
+
+    Node,
+    NodeHeader,
+    Input,
+    Output,
+    None
+
+}
+
+interface MouseCollitions {
+
+    position: Vector2;
+    type: MouseCollitionTypes
+    victum: any;
+    victumPort?: Input | Output | null;
+    victumPortIndex?: number;
+
+}
+
+export function GetMouseCollitions(ThisBlueprint: Blueprint): Array<MouseCollitions> {
+
+    let collitions: Array<MouseCollitions> = []
+
+    let MousePos = new Vector2(window.mousePos.x, window.mousePos.y).add(ThisBlueprint.Camera.Position as Vector2);
+
+    function GetInputOutputPosition(port: Input | Output, ParentNode: Node): Vector2 {
+
+        let Node = ParentNode;
+
+        if (Node == null) return Vector2.zero;
+
+        let index = Node.inputs.findIndex(input => input == port);
+        if (index == -1) index = Node.outputs.findIndex(output => output == port);
+
+        let x = Node._position.x + (port instanceof Output ? Node._width - 15 : 15)
+
+        return new Vector2(x, Node._position.y + 40 + (index * 20));
+
+    }
+
+    for (let i = 0; i < ThisBlueprint.allNodes.length; i++) {
+
+        let ThisNode = ThisBlueprint.allNodes[i];
+
+        let NodePos = ThisNode._position;
+
+        let NodeHeight = 30 + ((ThisNode.inputs.length > ThisNode.outputs.length ? ThisNode.inputs.length : ThisNode.outputs.length) * 20)
+
+        // check for a collition with the node
+        if (MousePos.x > NodePos.x && MousePos.x < NodePos.x + ThisNode._width && MousePos.y > NodePos.y && MousePos.y < NodePos.y + NodeHeight) {
+
+            collitions.push({ position: NodePos, type: MouseCollitionTypes.Node, victum: ThisNode });
+
+        }
+
+        // check for a collition with the node header
+        if (MousePos.x > NodePos.x && MousePos.x < NodePos.x + ThisNode._width && MousePos.y > NodePos.y && MousePos.y < NodePos.y + 20) {
+
+            collitions.push({ position: NodePos, type: MouseCollitionTypes.NodeHeader, victum: ThisNode });
+
+        }
+
+        // check for a collition with the inputs
+        for (let j = 0; j < ThisNode.inputs.length; j++) {
+
+            let InputPos = GetInputOutputPosition(ThisNode.inputs[j], ThisNode);
+
+            if (MousePos.distance(InputPos) < 8) {
+
+                collitions.push({ position: InputPos, type: MouseCollitionTypes.Input, victum: ThisNode, victumPort: ThisNode.inputs[j], victumPortIndex: j });
+
+            }
+
+        }
+
+        // check for a collition with the outputs
+        for (let j = 0; j < ThisNode.outputs.length; j++) {
+
+            let OutputPos = GetInputOutputPosition(ThisNode.outputs[j], ThisNode);
+
+            if (MousePos.distance(OutputPos) < 8) {
+
+                collitions.push({ position: OutputPos, type: MouseCollitionTypes.Output, victum: ThisNode, victumPort: ThisNode.outputs[j], victumPortIndex: j });
+
+            }
+
+        }
+
+    }
+
+    return collitions
+
 }

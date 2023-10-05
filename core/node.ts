@@ -41,7 +41,7 @@ export class Input {
 
 }
 
-export class Output extends Input {}
+export class Output extends Input { }
 
 export class Connection {
 
@@ -106,7 +106,7 @@ export abstract class Node {
             if (this.parentBlueprint!.allConnections.some(connection => connection.input == input)) {
                 let connection = this.parentBlueprint!.allConnections.find(connection => connection.input == input)!;
                 let output = this.parentBlueprint!.runtime.getOutput(connection.output._id);
-                if (output == null){
+                if (output == null) {
                     console.error("Output not set!, Somthings wrong here!!!!!")
                     inputValues[input.name] = null;
                 } else {
@@ -125,7 +125,7 @@ export abstract class Node {
 
     }
 
-    setOutput(Name: string, Value: any){
+    setOutput(Name: string, Value: any) {
 
         if (this.parentBlueprint == null) throw new Error("Node is not in a blueprint!");
         if (!this.outputs.some(output => output.name == Name)) throw new Error("Output with name '" + Name + "' does not exist!");
@@ -136,7 +136,7 @@ export abstract class Node {
     }
 
     abstract run(runtime: Runtime): void;
-    
+
     log(message: any) {
         this.parentBlueprint?.runtime.log(message, LogLevels.Info, this);
     }
@@ -233,5 +233,32 @@ export class SetVariable extends Node {
         this.setOutput("Signal", null);
 
     }
+
+}
+
+export class Constant extends Node {
+
+    nodeCustomData: any = {
+        type: Types.Number,
+        value: 0
+    }
+
+    name: string = "Constant"
+
+    constructor(CustomData: any) {
+        super(CustomData);
+        this.inputs = [];
+        this.outputs = [new Output("Value", CustomData.type)];
+
+        this.name = CustomData.value + " Constant";
+        this.nodeCustomData = CustomData;
+    }
+
+    async run(runtime: Runtime): Promise<void> {
+
+        this.setOutput("Value", this.nodeCustomData.value);
+
+    }
+
 
 }

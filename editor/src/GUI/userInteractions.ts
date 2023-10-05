@@ -4,6 +4,7 @@ It needs to be cleaned up and rewritten
 */
 
 import { Blueprint, Node, GenericNode, Vector2, Output, Types, Connection } from "../../../core"
+import { GetMouseCollitions } from "./render";
 
 function Distance(a: Vector2, b: Vector2) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
@@ -39,204 +40,54 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
         if (e.button == 0) {
             // check if the mouse is on a node
 
-            let HasDoneSomething = false;
+            let collitions = GetMouseCollitions(CurrentBlueprint);
+            let headerCollision = collitions.find(collition => collition.type == 1);
 
-            if (false) {
+            if (headerCollision) {
 
-                let Pos = window.rightClickMenu.position;
-                let Size = new Vector2(window.rightClickMenu.width, window.rightClickMenu.height);
+                MouseInput = MouseInputType.DraggingNode;
+                window.draggingInfo.isDraggingNode = true;
+                window.draggingInfo.node = headerCollision.victum;
 
-                let RenderdNodes = [];
-                if (window.rightClickMenu.search.length == 0) {
-                    RenderdNodes = window.rightClickMenu.nodes.slice(0, 10);
-                } else {
-                    let search: string = window.rightClickMenu.search.toLowerCase();
-                    RenderdNodes = window.rightClickMenu.nodes.filter((node: Node) => node.name.toLowerCase().includes(search)).slice(0, 10);
-                }
-
-                let NodeHeight = 29;
-                let NodeWidth = 150;
-
-                RenderdNodes.forEach((node: typeof GenericNode, index: number) => {
-
-                    let buttonX = window.rightClickMenu.position.x
-                    let buttonY = window.rightClickMenu.position.y + (index * NodeHeight) + 41;
-
-                    if (MousePos.x > buttonX && MousePos.x < buttonX + NodeWidth && MousePos.y > buttonY && MousePos.y < buttonY + NodeHeight) {
-
-                        let NewNode = new node()
-                        NewNode._position = window.rightClickMenu.position
-
-                        CurrentBlueprint.addNode(NewNode);
-
-                        window.rightClickMenu.open = false;
-
-                        HasDoneSomething = true;
-
-                    }
-
-                })
-
-                let search: string = window.rightClickMenu.search.toLowerCase();
-                if (RenderdNodes.length == 0) {
-
-                    if (search == String(parseFloat(search))){
-
-                        if (MousePos.x > Pos.x && MousePos.x < Pos.x + Size.x && MousePos.y > Pos.y && MousePos.y < Pos.y + Size.y) {
-                            let NewNode = new GenericNode()
-
-                            let name = String(parseFloat(search))
-
-                            NewNode.inputs = []
-                            NewNode.outputs = [new Output(name, Types.Number)]
-
-                            NewNode.name = name
-                            NewNode._width = 100
-
-                            NewNode.run = async (runtime) => {
-                                NewNode.setOutput(name, parseFloat(search))
-                            }
-
-                            NewNode._position = window.rightClickMenu.position
-                            CurrentBlueprint.addNode(NewNode);
-
-                        }
-
-                    }
-
-                }
-
-            } else {
-
-                CurrentBlueprint.allNodes.forEach(node => {
-                    // if the mouse is on the header
-                    if (e.x > (node._position.x - BlueprintCamera.Position.x) && e.x < (node._position.x - BlueprintCamera.Position.x) + node._width && e.y > (node._position.y - BlueprintCamera.Position.y) && e.y < (node._position.y - BlueprintCamera.Position.y) + 20) {
-                        SelectedNode = node;
-                        Offset.x = e.x - node._position.x;
-                        Offset.y = e.y - node._position.y;
-
-
-                        MouseInput = MouseInputType.DraggingNode;
-                        window.draggingInfo.isDraggingNode = true;
-                        window.draggingInfo.node = node;
-                        HasDoneSomething = true;
-                    }
-
-                    // if is over a input / output
-                    for (let i = 0; i < node.inputs.length; i++) {
-                        let CircleX = node._position.x + 15;
-                        let CircleY = node._position.y + 40 + (i * 20);
-
-                        if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
-
-                            SelectedInput = i;
-                            SelectedOutput = -1;
-                            SelectedNode = node;
-
-
-                            MouseInput = MouseInputType.DraggingConnection;
-
-                            window.draggingInfo.isDragging = true;
-                            window.draggingInfo.node = node;
-                            window.draggingInfo.input = true;
-                            window.draggingInfo.index = i;
-
-                            HasDoneSomething = true;
-
-                        }
-
-                    }
-
-                    for (let i = 0; i < node.outputs.length; i++) {
-                        let CircleX = node._position.x + node._width - 15;
-                        let CircleY = node._position.y + 40 + (i * 20);
-
-                        if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
-
-                            SelectedInput = -1;
-                            SelectedOutput = i;
-                            SelectedNode = node;
-
-                            MouseInput = MouseInputType.DraggingConnection;
-
-                            window.draggingInfo.isDragging = true;
-                            window.draggingInfo.node = node;
-                            window.draggingInfo.input = false;
-                            window.draggingInfo.index = i;
-
-                            HasDoneSomething = true;
-
-                        }
-
-                    }
-
-                })
+                SelectedNode = headerCollision.victum;
+                Offset.x = e.x - headerCollision.victum._position.x;
+                Offset.y = e.y - headerCollision.victum._position.y;
 
             }
 
-            // handel 
-            if (!HasDoneSomething) {
-                window.rightClickMenu.open = false;
+            let portCollision = collitions.find(collition => collition.type == 3 || collition.type == 2);
+
+            if (portCollision) {
+
+                let port = portCollision.victumPort!
+                let portIndex = portCollision.victumPortIndex!
+
+                SelectedInput = portCollision.type == 3 ? -1 : portIndex;
+                SelectedOutput = portCollision.type == 4 ? -1 : portIndex;
+                SelectedNode = portCollision.victum;
+
+                MouseInput = MouseInputType.DraggingConnection;
+
+                window.draggingInfo.isDragging = true;  
+                window.draggingInfo.node = portCollision.victum;
+                window.draggingInfo.input =  portCollision.type == 3 ? false : true;
+                window.draggingInfo.index = portIndex
+
             }
 
         } else if (e.button == 2) {
 
             let HasDoneSomething = false;
 
-            // when you right click a input or output, remove the connection
-            CurrentBlueprint.allNodes.forEach(node => {
+            let collitions = GetMouseCollitions(CurrentBlueprint);
+            let collition = collitions.find(collition => collition.type == 3 || collition.type == 2);
 
-                for (let i = 0; i < node.inputs.length; i++) {
-                    let CircleX = node._position.x + 15;
-                    let CircleY = node._position.y + 40 + (i * 20);
+            if (collition) {
 
-                    if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
+                // remove any connections that are connected to the connection
+                let connections = CurrentBlueprint.allConnections.filter(connection => connection.input == collition?.victumPort || connection.output == collition?.victumPort);
 
-                        let Con = CurrentBlueprint.allConnections.find(x => x.input == node.inputs[i]);
-                        if (Con != null) {
-                            CurrentBlueprint.allConnections.splice(CurrentBlueprint.allConnections.indexOf(Con), 1);
-                        }
-
-                        SelectedInput = -1;
-                        SelectedOutput = -1;
-
-                        HasDoneSomething = true;
-
-                    }
-
-                }
-
-                for (let i = 0; i < node.outputs.length; i++) {
-                    let CircleX = node._position.x + node._width - 15;
-                    let CircleY = node._position.y + 40 + (i * 20);
-
-                    if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
-
-                        let Cons = CurrentBlueprint.allConnections.filter(x => x.output == node.outputs[i]);
-                        if (Cons != null) {
-                            Cons.forEach(con => {
-                                CurrentBlueprint.allConnections.splice(CurrentBlueprint.allConnections.indexOf(con), 1);
-                            })
-                        }
-
-                        SelectedInput = -1;
-                        SelectedOutput = -1;
-
-                        HasDoneSomething = true;
-
-                    }
-
-                }
-
-            })
-
-            if (!HasDoneSomething) {
-
-                window.rightClickMenu.open = true;
-                window.rightClickMenu.position = { x: e.x, y: e.y } as Vector2;
-
-                window.rightClickMenu.search = "";
-                window.rightClickMenu.selectedCatagory = null;
+                CurrentBlueprint.allConnections = CurrentBlueprint.allConnections.filter(connection => !connections.includes(connection));
 
             }
 
@@ -263,6 +114,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
         MousePos.y = e.y;
 
         window.mousePos = MousePos;
+
     })
 
     Canvas.addEventListener("mouseup", (e) => {
@@ -286,7 +138,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
         window.draggingInfo.isDragging = false;
         window.draggingInfo.isDraggingNode = false;
         window.draggingInfo.node = null;
-        
+
         // check if we where holding a input / output if we were over a input / output
         if (SelectedInput != -1) {
 
@@ -437,28 +289,6 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
         if (e.key == "Control") {
             BlueprintCamera.Zoom = 1;
-        }
-
-        if (window.rightClickMenu.open) {
-
-            if (e.key == "Backspace") {
-                window.rightClickMenu.search = window.rightClickMenu.search.slice(0, -1);
-            } else if (e.key == "Enter") {
-                window.rightClickMenu.open = false;
-
-                let search: string = window.rightClickMenu.search.toLowerCase();
-                let WantedNode: typeof GenericNode = window.rightClickMenu.nodes.filter((node: Node) => node.name.toLowerCase().includes(search))[0]
-
-
-                let NewNode = new WantedNode()
-                NewNode._position = window.rightClickMenu.position as Vector2
-
-                CurrentBlueprint.addNode(NewNode);
-
-            } else if (e.key.length == 1) {
-                window.rightClickMenu.search += e.key;
-            }
-
         }
 
     })

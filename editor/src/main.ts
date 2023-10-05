@@ -88,17 +88,3 @@ window.draggingInfo = {
     isDraggingNode: false,
 
 }
-
-window.rightClickMenu = {
-
-    open: false,
-    position: new Vector2(0, 0),
-    search: "",
-    catagotys: [],
-    selectedCatagory: null,
-    nodes: [],
-
-    width: 150,
-    height: 300,
-
-}
