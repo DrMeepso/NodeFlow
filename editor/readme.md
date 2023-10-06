@@ -1,1 +1,1 @@
-A web based editor for the blueprint libbery made in svelte.
+A web based editor for the core nodeflow library.

@@ -2,6 +2,7 @@ import * as Controll from './controll';
 import * as Logic from './logic';
 import * as Debug from './debug';
 import * as Math from './maths';
+import * as String from './string';
 import { SetVariable, GetVariable } from '../node';
 let Variables = {
 
@@ -20,4 +21,4 @@ let Variables = {
 
 };
 
-export { Controll, Logic, Debug, Variables, Math };
+export { Controll, Logic, Debug, Variables, Math, String };

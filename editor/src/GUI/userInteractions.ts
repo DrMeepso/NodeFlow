@@ -77,8 +77,6 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
         } else if (e.button == 2) {
 
-            let HasDoneSomething = false;
-
             let collitions = GetMouseCollitions(CurrentBlueprint);
             let collition = collitions.find(collition => collition.type == 3 || collition.type == 2);
 
@@ -94,7 +92,6 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
         } else if (e.button == 1) {
             // middle mouse button
             MouseInput = MouseInputType.MovingCamera;
-            window.rightClickMenu.open = false;
         }
 
     })
@@ -139,106 +136,31 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
         window.draggingInfo.isDraggingNode = false;
         window.draggingInfo.node = null;
 
+        const collitions = GetMouseCollitions(CurrentBlueprint);
+
         // check if we where holding a input / output if we were over a input / output
         if (SelectedInput != -1) {
 
             // check if we where droped on a output
-            CurrentBlueprint.allNodes.forEach(node => {
-                for (let i = 0; i < node.outputs.length; i++) {
-                    let CircleX = node._position.x + node._width - 15;
-                    let CircleY = node._position.y + 40 + (i * 20);
+            let portCollision = collitions.find(collition => collition.type == 3);
 
-                    if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
+            let input = SelectedNode!.inputs[SelectedInput];
 
-                        // check if the types match
-                        if (node.outputs[i].type == SelectedNode!.inputs[SelectedInput].type || SelectedNode!.inputs[SelectedInput].type == Types.Any) {
+            CurrentBlueprint.connectNodes(input, portCollision?.victumPort!);
 
-                            let Input = SelectedNode!.inputs[SelectedInput];
-                            let Output = node.outputs[i];
+            SelectedInput = -1;
 
-                            let NConnection = {} as Connection;
-
-                            NConnection.input = Input;
-                            NConnection.output = Output;
-
-
-                            // check if input is already connected
-                            let Inputed = CurrentBlueprint.allConnections.filter(connection => connection.input == Input).length > 0;
-                            if (Inputed) {
-                                console.log("Input is already connected");
-                                return;
-                            }
-
-                            if (node.outputs[i].type == Types.Signal) {
-                                // check if output is already connected
-                                let Outputed = CurrentBlueprint.allConnections.filter(connection => connection.output == Output).length > 0;
-                                if (Outputed) {
-                                    console.log("Output is already connected");
-                                    return;
-                                }
-                            }
-
-                            // get the blueprint
-                            let Blueprint = node.parentBlueprint!;
-                            Blueprint.allConnections.push(NConnection);
-
-
-                        }
-
-                    }
-
-                }
-            })
 
         } else if (SelectedOutput != -1) {
 
             // check if we where droped on a input
-            CurrentBlueprint.allNodes.forEach(node => {
-                for (let i = 0; i < node.inputs.length; i++) {
-                    let CircleX = node._position.x + 15;
-                    let CircleY = node._position.y + 40 + (i * 20);
+            let portCollision = collitions.find(collition => collition.type == 2);
 
-                    if (Distance({ x: e.x, y: e.y } as Vector2, { x: CircleX - BlueprintCamera.Position.x, y: CircleY - BlueprintCamera.Position.y } as Vector2) < 13) {
+            let output = SelectedNode!.outputs[SelectedOutput];
 
-                        // check if the types match
-                        if (node.inputs[i].type == SelectedNode!.outputs[SelectedOutput].type || node.inputs[i].type == Types.Any) {
+            CurrentBlueprint.connectNodes(portCollision?.victumPort!, output);
 
-                            let Input = node.inputs[i];
-                            let Output = SelectedNode!.outputs[SelectedOutput];
-
-                            let NConnection = {} as Connection;
-
-                            NConnection.input = Input;
-                            NConnection.output = Output;
-
-
-                            // check if input is already connected
-                            let Inputed = CurrentBlueprint.allConnections.filter(connection => connection.input == Input).length > 0;
-                            if (Inputed) {
-                                console.log("Input is already connected");
-                                return;
-                            }
-
-                            if (node.inputs[i].type == Types.Signal) {
-                                // check if output is already connected
-                                let Outputed = CurrentBlueprint.allConnections.filter(connection => connection.output == Output).length > 0;
-                                if (Outputed) {
-                                    console.log("Output is already connected");
-                                    return;
-                                }
-                            }
-
-                            // get the blueprint
-                            let Blueprint = node.parentBlueprint!;
-                            Blueprint.allConnections.push(NConnection);
-
-                        }
-
-                    }
-
-                }
-
-            })
+            SelectedOutput = -1;
 
         }
 
