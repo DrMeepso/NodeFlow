@@ -126,7 +126,7 @@
 
 <svelte:window bind:innerHeight={innerHeight} />
 
-<Nob bind:heightVariable={height} /> <!--Draggable black line to resize-->
+<Nob bind:height /> <!--Draggable black line to resize-->
 <main id="Logs" style="height: {height}px">
 
     <div id="LogHeader">
