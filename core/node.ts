@@ -2,6 +2,7 @@ import { Vector2 } from "./generics";
 import { Blueprint, Runtime, Variable } from "./blueprint";
 import { v4 as uuidv4 } from 'uuid';
 import { LogLevels, Log } from "./blueprint";
+import { DefaultNodes } from ".";
 
 export enum Types {
 
@@ -74,7 +75,7 @@ export abstract class Node {
     parentBlueprint: Blueprint | null = null;
 
     nodeCustomData: any // allow for info that may change a node to be saved, ie a variable reference
-
+    
     constructor(CustomData?: any) {
         this.inputs.push(new Input("Signal", Types.Signal));
         this.outputs.push(new Output("Signal", Types.Signal));
@@ -108,6 +109,8 @@ export abstract class Node {
                 let output = this.parentBlueprint!.runtime.getOutput(connection.output._id);
                 if (output == null) {
                     console.error("Output not set!, Somthings wrong here!!!!!")
+                    // happends when connection is connected to a node that has not been run yet
+                    // or if somthing just fucks up
                     inputValues[input.name] = null;
                 } else {
                     inputValues[input.name] = output!.OutputValue;

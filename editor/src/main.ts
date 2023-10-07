@@ -35,18 +35,6 @@ const context = new ContextMenu({
 
 let testVariable = bp.createVariable("Test Number", Types.Number, 0);
 
-/*
-let getVari = new DefaultNodes.Variables.GetVariable(testVariable);
-//bp.addNode(getVari);
-
-let vectorTestVariable = bp.createVariable("Vector Test", Types.Vector2, new Vector2(15, 15));
-let getVectorVari = new DefaultNodes.Variables.GetVariable(vectorTestVariable);
-//bp.addNode(getVectorVari);
-
-let setVectorVari = new DefaultNodes.Variables.SetVariable(testVariable);
-//bp.addNode(setVectorVari);
-*/
-
 SetupUserInteractions(bp);
 
 setInterval(() => {
@@ -88,3 +76,6 @@ window.draggingInfo = {
     isDraggingNode: false,
 
 }
+
+let Concat = DefaultNodes
+console.log(Concat)
