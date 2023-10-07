@@ -1,52 +1,26 @@
 <script lang="ts">
-
-    export let heightVariable;
-
-    import {createEventDispatcher} from "svelte";
-    const dispatch = createEventDispatcher();
-
-    let currentY = 0
-    let IsDragging = false
-
-    function mouseDown(){
-        IsDragging = true
-    }
-
-    function mouseUp(){
-        IsDragging = false
-    }
-
-    function mouseMove(e: any){
-
-        currentY = e.clientY
-
-        if (IsDragging){
-
-            heightVariable = window.innerHeight - currentY
-
-            dispatch("heightChange", heightVariable)
-
-        }
-
-
-    }
-
+  export let height: number;
+  let grabbing: boolean = false;
 </script>
 
-<svelte:document on:mousemove={mouseMove} on:mouseup={mouseUp} />
+<svelte:window
+  on:mousemove={(event) => {
+    if (!grabbing) return;
+    const { clientHeight } = document.body;
+    const mouseY = clientHeight - event.pageY;
+    height = Math.min(Math.max(mouseY, 20), clientHeight - 20);
+  }}
+  on:mouseup={() => {
+    grabbing = false;
+  }}
+/>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div id="Draggable" on:mousedown={mouseDown} on:mouseup={mouseUp}></div>
+<div class="draggable" on:mousedown|preventDefault={() => (grabbing = true)} />
 
-<style>
-
-    #Draggable{
-
-        width: 100%;
-        height: 3px;
-        background-color: #212121;
-        cursor: ns-resize;
-
-    }
-
+<style lang="postcss">
+  .draggable {
+    background-color: #212121;
+    cursor: ns-resize;
+    height: 3px;
+  }
 </style>
