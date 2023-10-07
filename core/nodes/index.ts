@@ -1,8 +1,8 @@
-import * as Controll from './controll';
-import * as Logic from './logic';
-import * as Debug from './debug';
-import * as Math from './maths';
-import * as String from './string';
+import Controll from './controll';
+import Logic from './logic';
+import Debug from './debug';
+import Math from './maths';
+import String from './string';
 import { SetVariable, GetVariable } from '../node';
 let Variables = {
 

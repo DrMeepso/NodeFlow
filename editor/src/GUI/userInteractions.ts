@@ -50,8 +50,7 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
                 window.draggingInfo.node = headerCollision.victum;
 
                 SelectedNode = headerCollision.victum;
-                Offset.x = e.x - headerCollision.victum._position.x;
-                Offset.y = e.y - headerCollision.victum._position.y;
+                Offset = new Vector2(SelectedNode!._position.x - MousePos.x, SelectedNode!._position.y - MousePos.y);
 
             }
 
@@ -99,7 +98,8 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
     Canvas.addEventListener("mousemove", (e) => {
 
         if (SelectedNode != null && MouseInput == MouseInputType.DraggingNode) {
-            SelectedNode._position = { x: e.x + BlueprintCamera.Position.x, y: e.y + BlueprintCamera.Position.y } as Vector2;
+            //SelectedNode._position = { x: e.x + BlueprintCamera.Position.x, y: e.y + BlueprintCamera.Position.y } as Vector2;
+            SelectedNode._position = Offset.add(MousePos);
         }
 
         if (MouseInput == MouseInputType.MovingCamera) {

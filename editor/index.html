@@ -9,11 +9,13 @@
 </head>
 
 <body>
-    <div id="Mainholder">
-        <div id="canvasSpace">
-            <canvas id="canvas"></canvas>
+    <div id="editorHolder">
+        <div id="centerHolder">
+            <div id="canvasSpace">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="logs"></div>
         </div>
-        <div id="logs"></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
 </body>
@@ -27,10 +29,19 @@
         overflow: hidden;
     }
 
-    #Mainholder {
+    #editorHolder {
+
+        display: flex;
+
+        height: 100vh;
+        width: 100vw;
+
+    }
+
+    #centerHolder {
         display: grid;
         flex-direction: column;
-        width: 100vw;
+        width: 100%;
         height: 100vh;
     }
 
@@ -48,9 +59,5 @@
 
     }
 
-    #logs {
-
-
-
-    }
+    #logs {}
 </style>

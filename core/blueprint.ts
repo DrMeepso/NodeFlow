@@ -70,6 +70,23 @@ export class Blueprint {
     }
 
     connectNodes(input: Input, output: Output) {
+
+        if (input == undefined || output == undefined) return
+
+        // check if the output is already connected to something
+        if (this.allConnections.some(connection => connection.input == input)) {
+            throw new Error("Input is already connected to something")
+        }
+
+        // check if both the input and output are the same type
+        if (input.type != output.type && (input.type != Types.Any && output.type != Types.Any)) {
+            throw new Error("Input and output are not the same type")
+        }
+
+        if (input.type == Types.Signal && output.type != Types.Signal || input.type != Types.Signal && output.type == Types.Signal) {
+            throw new Error("Input and output are not the same type")
+        }
+
         this.allConnections.push(new Connection(input, output));
     }
 
@@ -104,6 +121,8 @@ export class Blueprint {
                     let connection = CurrentBlueprint.allConnections.find(connection => connection.input == inputs[i])!;
                     let inputNode = CurrentBlueprint.allNodes.find(node => node.outputs.includes(connection.output))!;
                     if (inputNode.linear == false) return;
+                    // if the input node has any signal inputs or outputs stop the function
+                    if (inputNode.inputs.some(input => input.type == Types.Signal) || inputNode.outputs.some(output => output.type == Types.Signal)) return;
                     await LookAtNode(inputNode);
                 }
             })
@@ -222,7 +241,7 @@ export class Runtime {
         this.OutputResults = [];
         this.CurrentVariables = [];
         this.CurrentNode = null;
-        this.RecordedLogs = [];
+        //this.RecordedLogs = [];
 
         this.callBacks.forEach(cb => cb());
 
