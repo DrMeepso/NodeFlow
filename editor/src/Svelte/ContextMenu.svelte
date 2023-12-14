@@ -43,6 +43,8 @@
         id: string
         colour: string
 
+        hide?: boolean
+
         nodes: NodeEntry[]
 
     }
@@ -246,12 +248,14 @@
         {#if IsSelectedingCatagory && !isSeraching }
 
             {#each allCatagories as ThisCatagory}
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <div class="CatHolder" on:click={CatagorySelected(ThisCatagory)}>
-                    <p>{ThisCatagory.name}</p>
-                </div>
-                <hr>
+                {#if ThisCatagory.hide != true}
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <div class="CatHolder" on:click={CatagorySelected(ThisCatagory)}>
+                        <p>{ThisCatagory.name}</p>
+                    </div>
+                    <hr>
+                {/if}
             {/each}
 
         {:else if !isSeraching}

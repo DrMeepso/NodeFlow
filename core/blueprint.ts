@@ -1,6 +1,8 @@
 import { Vector2 } from "./generics";
 import { Node, Connection, Types, Input, Output, StartNode } from "./node"
 import { v4 as uuidv4 } from 'uuid';
+import type { serializedBlueprint } from "./serialization";
+import { deserializeBlueprint } from "./serialization";
 
 interface Dependency { }
 
@@ -190,6 +192,23 @@ export class Blueprint {
 
     getVariable(name: string) {
         return this.allVariables.find(variable => variable.name == name);
+    }
+
+    loadBlueprint(serialized: serializedBlueprint) {
+
+        
+        let newBP = deserializeBlueprint(serialized);
+       
+        console.log(newBP)
+
+        this.allNodes = newBP.allNodes;
+        this.allConnections = newBP.allConnections;
+        this.allVariables = newBP.allVariables;
+
+        this.runtime.clearContext();
+
+
+
     }
 
 }

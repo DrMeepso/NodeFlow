@@ -48,12 +48,17 @@ declare global {
     interface Window {
         runExicutionOrder: () => void;
         runBlueprint: () => void;
+        serializeBlueprint: () => void;
+        reSerializeBlueprint: () => void;
         draggingInfo: any;
         mousePos: Vector2;
         rightClickMenu: any;
+        blueprint: Blueprint;
     }
 
 }
+
+window.blueprint = bp;
 
 window.runExicutionOrder = () => {
 
@@ -63,6 +68,20 @@ window.runExicutionOrder = () => {
 window.runBlueprint = () => {
 
     bp.runBlueprint();
+
+}
+
+import { serializeBlueprint } from "../../core/serialization";
+window.serializeBlueprint = () => {
+
+    console.log(serializeBlueprint(bp));
+
+}
+
+window.reSerializeBlueprint = () => {
+
+    let serializedBlueprint = serializeBlueprint(bp);
+    bp.loadBlueprint(serializedBlueprint);
 
 }
 
@@ -76,6 +95,3 @@ window.draggingInfo = {
     isDraggingNode: false,
 
 }
-
-let Concat = DefaultNodes
-console.log(Concat)
