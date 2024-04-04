@@ -3,40 +3,54 @@ import { Blueprint, Runtime, Variable } from "./blueprint";
 import { LogLevels, Log } from "./blueprint";
 import { uuidv4 } from "./uuid"
 
-// Need to fingure out how to allow for custom types to be added
-export enum Types {
 
-    Signal,
-    Number,
-    String,
-    Boolean,
-    Array,
-    Vector2,
-    Any
+export interface NodeType {
 
+    name: string;
+    color: string;
 }
 
-export enum TypeColors {
+export let NodeTypes = {
 
-    "#ffffff",
-    "#0AD2FF",
-    "#2962FF",
-    "#9500FF",
-    "#FF0059",
-    "#B4E600",
-    "#FF8C00"
+    Signal: {
+        name: "Signal",
+        color: "#ffffff"
+    },
+    Number: {
+        name: "Number",
+        color: "#0AD2FF"
+    },
+    String: {
+        name: "String",
+        color: "#2962FF"
+    },
+    Boolean: {
+        name: "Boolean",
+        color: "#9500FF"
+    },
+    Array: {
+        name: "Array",
+        color: "#FF0059"
+    },
+    Vector2: {
+        name: "Vector2",
+        color: "#B4E600"
+    },
+    Any: {
+        name: "Any",
+        color: "#FF8C00"
+    }
 
 }
-
 
 export class Input {
 
     name: string;
-    type: Types;
+    type: NodeType;
 
     _id: string = uuidv4();
 
-    constructor(name: string, type: Types) {
+    constructor(name: string, type: NodeType) {
         this.name = name;
         this.type = type;
     }
@@ -76,18 +90,18 @@ export abstract class Node {
     parentBlueprint: Blueprint | null = null;
 
     nodeCustomData: any // allow for info that may change a node to be saved, ie a variable reference
-    
+
     constructor(CustomData?: any) {
-        this.inputs.push(new Input("Signal", Types.Signal));
-        this.outputs.push(new Output("Signal", Types.Signal));
+        this.inputs.push(new Input("Signal", NodeTypes.Signal));
+        this.outputs.push(new Output("Signal", NodeTypes.Signal));
         this._position = new Vector2(0, 0);
         this.nodeCustomData = CustomData;
     }
 
-    addInput(name: string, type: Types) {
+    addInput(name: string, type: NodeType) {
         this.inputs.push(new Input(name, type));
     }
-    addOutput(name: string, type: Types) {
+    addOutput(name: string, type: NodeType) {
         this.outputs.push(new Output(name, type));
     }
 
@@ -100,7 +114,7 @@ export abstract class Node {
         for (let i = 0; i < this.inputs.length; i++) {
             let input = this.inputs[i];
 
-            if (input.type == Types.Signal) continue;
+            if (input.type == NodeTypes.Signal) continue;
 
             //console.log(input)
 
@@ -161,8 +175,8 @@ export class GenericNode extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Signal", Types.Signal)];
-        this.outputs = [new Output("Signal", Types.Signal)];
+        this.inputs = [new Input("Signal", NodeTypes.Signal)];
+        this.outputs = [new Output("Signal", NodeTypes.Signal)];
     }
 
     run(runtime: Runtime): void {
@@ -177,7 +191,7 @@ export class StartNode extends Node {
     constructor() {
         super();
         this.inputs = [];
-        this.outputs = [new Output("Signal", Types.Signal)];
+        this.outputs = [new Output("Signal", NodeTypes.Signal)];
     }
     async run(runtime: Runtime): Promise<void> {
         this.setOutput("Signal", null);
@@ -216,8 +230,8 @@ export class SetVariable extends Node {
 
     constructor(variable: Variable) {
         super();
-        this.inputs = [new Output("Signal", Types.Signal), new Input("Value", variable.type)];
-        this.outputs = [new Output("Signal", Types.Signal)];
+        this.inputs = [new Output("Signal", NodeTypes.Signal), new Input("Value", variable.type)];
+        this.outputs = [new Output("Signal", NodeTypes.Signal)];
         this.name = variable.name;
         this.thisVariable = variable;
     }
@@ -243,7 +257,7 @@ export class SetVariable extends Node {
 export class Constant extends Node {
 
     nodeCustomData: any = {
-        type: Types.Number,
+        type: NodeTypes.Number,
         value: 0
     }
 
@@ -273,7 +287,7 @@ export class EventNode extends Node {
     constructor(eventName: string, values: Output[]) {
         super();
         this.inputs = [];
-        this.outputs = [new Output("Signal", Types.Signal), ...values];
+        this.outputs = [new Output("Signal", NodeTypes.Signal), ...values];
         this.name = eventName;
     }
 

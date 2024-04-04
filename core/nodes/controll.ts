@@ -1,5 +1,5 @@
 
-import { Node, Input, Output, Types } from "../node";
+import { Node, Input, Output, NodeTypes } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
 class ForLoop extends Node {
@@ -9,8 +9,8 @@ class ForLoop extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Signal", Types.Signal), new Input("Start", Types.Number), new Input("End", Types.Number)];
-        this.outputs = [new Output("Loop", Types.Signal), new Output("Index", Types.Number), new Output("End", Types.Signal)];
+        this.inputs = [new Input("Signal", NodeTypes.Signal), new Input("Start", NodeTypes.Number), new Input("End", NodeTypes.Number)];
+        this.outputs = [new Output("Loop", NodeTypes.Signal), new Output("Index", NodeTypes.Number), new Output("End", NodeTypes.Signal)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -67,8 +67,8 @@ class IfStatement extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Signal", Types.Signal), new Input("Condition", Types.Boolean)];
-        this.outputs = [new Output("True", Types.Signal), new Output("False", Types.Signal)];
+        this.inputs = [new Input("Signal", NodeTypes.Signal), new Input("Condition", NodeTypes.Boolean)];
+        this.outputs = [new Output("True", NodeTypes.Signal), new Output("False", NodeTypes.Signal)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -109,8 +109,8 @@ class Wait extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Signal", Types.Signal), new Input("Time", Types.Number)];
-        this.outputs = [new Output("Signal", Types.Signal)];
+        this.inputs = [new Input("Signal", NodeTypes.Signal), new Input("Time", NodeTypes.Number)];
+        this.outputs = [new Output("Signal", NodeTypes.Signal)];
     }
 
     async run(runtime: Runtime): Promise<void> {

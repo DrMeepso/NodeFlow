@@ -1,5 +1,5 @@
 import { Vector2 } from "./generics";
-import { Node, Connection, Types, Input, Output, StartNode, EventNode } from "./node"
+import { Node, Connection, type NodeType, Input, Output, StartNode, EventNode, NodeTypes } from "./node"
 import { uuidv4 } from "./uuid"
 import type { serializedBlueprint } from "./serialization";
 import { deserializeBlueprint } from "./serialization";
@@ -12,10 +12,10 @@ interface Dependency { }
 export class Variable {
 
     name: string;
-    type: Types;
+    type: NodeType;
     value: any;
 
-    constructor(name: string, type: Types, value: any) {
+    constructor(name: string, type: NodeType, value: any) {
         this.name = name;
         this.type = type;
         this.value = value;
@@ -105,11 +105,11 @@ export class Blueprint {
         }
 
         // check if both the input and output are the same type
-        if (input.type != output.type && (input.type != Types.Any && output.type != Types.Any)) {
+        if (input.type != output.type && (input.type != NodeTypes.Any && output.type != NodeTypes.Any)) {
             throw new Error("Input and output are not the same type")
         }
 
-        if (input.type == Types.Signal && output.type != Types.Signal || input.type != Types.Signal && output.type == Types.Signal) {
+        if (input.type == NodeTypes.Signal && output.type != NodeTypes.Signal || input.type != NodeTypes.Signal && output.type == NodeTypes.Signal) {
             throw new Error("Input and output are not the same type")
         }
 
@@ -143,12 +143,12 @@ export class Blueprint {
             // get all inputs that are connected to a node that we havent looked at yet
             let inputs = node.inputs.filter(input => CurrentBlueprint.allConnections.filter(connection => connection.input == input).some(connection => !LookedNodes.includes(CurrentBlueprint.allNodes.find(node => node.outputs.includes(connection.output))!)));
             await inputs.forEach(async (input, i) => {
-                if (input.type != Types.Signal) {
+                if (input.type != NodeTypes.Signal) {
                     let connection = CurrentBlueprint.allConnections.find(connection => connection.input == inputs[i])!;
                     let inputNode = CurrentBlueprint.allNodes.find(node => node.outputs.includes(connection.output))!;
                     if (inputNode.linear == false) return;
                     // if the input node has any signal inputs or outputs stop the function
-                    if (inputNode.inputs.some(input => input.type == Types.Signal) || inputNode.outputs.some(output => output.type == Types.Signal)) return;
+                    if (inputNode.inputs.some(input => input.type == NodeTypes.Signal) || inputNode.outputs.some(output => output.type == NodeTypes.Signal)) return;
                     await LookAtNode(inputNode);
                 }
             })
@@ -159,7 +159,7 @@ export class Blueprint {
 
             // get all outputs that are connected to the node
             node.outputs.forEach(async (output, i) => {
-                if (output.type != Types.Signal) return;
+                if (output.type != NodeTypes.Signal) return;
                 let connections = CurrentBlueprint.allConnections.filter(connection => connection.output == output);
                 connections.forEach(async (connection, i) => {
                     let outputNode = CurrentBlueprint.allNodes.find(node => node.inputs.includes(connection.input))!;
@@ -209,7 +209,7 @@ export class Blueprint {
 
     }
 
-    createVariable(name: string, type: Types, value: any): Variable {
+    createVariable(name: string, type: NodeType, value: any): Variable {
         if (this.allVariables.some(variable => variable.name == name)) {
             throw new Error("Variable with name " + name + " already exists")
         }
@@ -345,7 +345,7 @@ export class Runtime {
             this.CurrentVariables.find(variable => variable.name == name)!.value = value;
             return;
         }
-        this.CurrentVariables.push({ name: name, type: Types.Any, value: value } as Variable);
+        this.CurrentVariables.push({ name: name, type: NodeTypes.Any, value: value } as Variable);
     }
 
     getOutput(id: string) {

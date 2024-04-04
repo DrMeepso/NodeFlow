@@ -1,4 +1,4 @@
-import { Node, Input, Output, Types } from "../node";
+import { Node, Input, Output, NodeTypes } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
 class Log extends Node {
@@ -7,8 +7,8 @@ class Log extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Signal", Types.Signal), new Input("Value", Types.Any)];
-        this.outputs = [new Output("Signal", Types.Signal)];
+        this.inputs = [new Input("Signal", NodeTypes.Signal), new Input("Value", NodeTypes.Any)];
+        this.outputs = [new Output("Signal", NodeTypes.Signal)];
     }
 
     async run(runtime: Runtime): Promise<void> {

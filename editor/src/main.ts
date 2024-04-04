@@ -2,7 +2,7 @@ import Logs from './Svelte/Logs.svelte'
 import ContextMenu from './Svelte/ContextMenu.svelte';
 import { writable } from 'svelte/store'
 
-import { Node, StartNode, Types, GenericNode, Blueprint, Vector2, DefaultNodes, Log } from "../../core/";
+import { Node, StartNode, NodeTypes, GenericNode, Blueprint, Vector2, DefaultNodes, Log } from "../../core/";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 import { EventNode, Output } from '../../core/node';
@@ -13,7 +13,7 @@ bp.runtime.lissenForLog((log?: Log) => {
 })
 
 const testEvent = new EventNode("onTest", [
-    new Output("testValue", Types.String)
+    new Output("testValue", NodeTypes.String)
 ])
 
 bp.addNode(testEvent);

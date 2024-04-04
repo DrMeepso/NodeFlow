@@ -1,4 +1,4 @@
-import { Node, Input, Output, Types } from "../node";
+import { Node, Input, Output, NodeTypes } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
 class Equal extends Node {
@@ -7,8 +7,8 @@ class Equal extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Value 1", Types.Any), new Input("Value 2", Types.Any)];
-        this.outputs = [new Output("Bool", Types.Boolean)];
+        this.inputs = [new Input("Value 1", NodeTypes.Any), new Input("Value 2", NodeTypes.Any)];
+        this.outputs = [new Output("Bool", NodeTypes.Boolean)];
     }
 
     async run(runtime: Runtime): Promise<void> {

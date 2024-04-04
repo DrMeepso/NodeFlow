@@ -6,12 +6,13 @@
     export let CurrentBlueprint: Blueprint
 
     // import nodes from files
-    import { Vector2, Node, Blueprint, GenericNode, Types, Constant } from "../../../core";
+    import { Vector2, Node, Blueprint, GenericNode, NodeTypes, Constant } from "../../../core";
 
     import { GetMouseCollitions } from "../GUI/render";
 
     import Icon from '@iconify/svelte';
     import type { Catagory } from "../../../core/nodes/index";
+    import type { NodeType } from "../../../core/node";
 
     let allCatagories: Catagory[] = CurrentBlueprint.avalibleNodes
 
@@ -143,16 +144,16 @@
 
     }
 
-    function WantsToCreateConstant(): Types {
+    function WantsToCreateConstant(): NodeType {
 
         // check for numbers
         if (SearchValue === String(parseFloat(SearchValue))){
-            return Types.Number
+            return NodeTypes.Number
         }
 
         // check for booleans
         if (SearchValue.toLowerCase() == "true" || SearchValue.toLowerCase() == "false"){
-            return Types.Boolean
+            return NodeTypes.Boolean
         }
 
         // check for vector2
@@ -163,14 +164,14 @@
             if (split.length == 2){
 
                 if (split[0] === String(parseFloat(split[0])) && split[1] === String(parseFloat(split[1]))){
-                    return Types.Vector2
+                    return NodeTypes.Vector2
                 }
 
             }
 
         }
 
-        return Types.String
+        return NodeTypes.String
 
     }
 
@@ -178,17 +179,17 @@
 
         switch (WantsToCreateConstant()){
 
-            case Types.Number:
+            case NodeTypes.Number:
                 return parseFloat(SearchValue)
 
-            case Types.Boolean:
+            case NodeTypes.Boolean:
                 return SearchValue.toLowerCase() == "true"
 
-            case Types.Vector2:
+            case NodeTypes.Vector2:
                 let split = SearchValue.split(",")
                 return new Vector2(parseFloat(split[0]), parseFloat(split[1]))
 
-            case Types.String:
+            case NodeTypes.String:
                 return SearchValue
 
         }

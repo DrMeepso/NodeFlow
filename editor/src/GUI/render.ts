@@ -3,7 +3,7 @@ This file is from a previous node project of mine
 It needs to be cleaned up and rewritten
 */
 
-import { Blueprint, Vector2, Node, Connection, Types, TypeColors, Input, Output } from "../../../core"
+import { Blueprint, Vector2, Node, Connection, NodeTypes, Input, Output } from "../../../core"
 
 const Canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = Canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -85,7 +85,7 @@ export function RenderBlueprint(bp: Blueprint) {
         let HoleList = window.draggingInfo.input ? inNode.inputs : inNode.outputs;
         let Hole = HoleList[window.draggingInfo.index];
 
-        ctx.strokeStyle = TypeColors[Hole.type];
+        ctx.strokeStyle = Hole.type.color;
         ctx.lineWidth = 5;
 
         let x = inNode._position.x + 15;
@@ -227,10 +227,10 @@ export function RenderNode(node: Node) {
     // render inputs
     for (let i = 0; i < node.inputs.length; i++) {
         // draw a circle for each input
-        ctx.fillStyle = TypeColors[node.inputs[i].type];
-        if (node.inputs[i].type != Types.Signal) {
+        ctx.fillStyle = node.inputs[i].type.color;
+        if (node.inputs[i].type != NodeTypes.Signal) {
 
-            if (node.inputs[i].type == Types.Any) {
+            if (node.inputs[i].type == NodeTypes.Any) {
 
                 // make circle a square
                 ctx.beginPath();
@@ -259,8 +259,8 @@ export function RenderNode(node: Node) {
     // render outputs
     for (let i = 0; i < node.outputs.length; i++) {
         // draw a circle for each output
-        ctx.fillStyle = TypeColors[node.outputs[i].type];
-        if (node.outputs[i].type != Types.Signal) {
+        ctx.fillStyle = node.outputs[i].type.color;
+        if (node.outputs[i].type != NodeTypes.Signal) {
             ctx.beginPath();
             ctx.arc(node._position.x + NodeWidth - 17, node._position.y + headerHeight + 20 + (i * 20), 8, 0, 2 * Math.PI);
             ctx.fill();
@@ -312,8 +312,8 @@ export function RenderConnection(Conn: Connection, parentBlueprint: Blueprint) {
 
     // make the strokestyle a gradient between the 2 colors
     let gradient = ctx.createLinearGradient(Start.x, Start.y, End.x, End.y);
-    gradient.addColorStop(0.1, TypeColors[Conn.input.type]);
-    gradient.addColorStop(0.9, TypeColors[Conn.output.type]);
+    gradient.addColorStop(0.1, Conn.input.type.color);
+    gradient.addColorStop(0.9, Conn.output.type.color);
 
     ctx.strokeStyle = gradient;
 
@@ -335,7 +335,7 @@ export function GetCanvas(): HTMLCanvasElement {
     return Canvas;
 }
 
-enum MouseCollitionTypes {
+enum MouseCollitionNodeTypes {
 
     Node,
     NodeHeader,
@@ -348,7 +348,7 @@ enum MouseCollitionTypes {
 interface MouseCollitions {
 
     position: Vector2;
-    type: MouseCollitionTypes
+    type: MouseCollitionNodeTypes
     victum: any;
     victumPort?: Input | Output | null;
     victumPortIndex?: number;
@@ -387,14 +387,14 @@ export function GetMouseCollitions(ThisBlueprint: Blueprint): Array<MouseColliti
         // check for a collition with the node
         if (MousePos.x > NodePos.x && MousePos.x < NodePos.x + ThisNode._width && MousePos.y > NodePos.y && MousePos.y < NodePos.y + NodeHeight) {
 
-            collitions.push({ position: NodePos, type: MouseCollitionTypes.Node, victum: ThisNode });
+            collitions.push({ position: NodePos, type: MouseCollitionNodeTypes.Node, victum: ThisNode });
 
         }
 
         // check for a collition with the node header
         if (MousePos.x > NodePos.x && MousePos.x < NodePos.x + ThisNode._width && MousePos.y > NodePos.y && MousePos.y < NodePos.y + 20) {
 
-            collitions.push({ position: NodePos, type: MouseCollitionTypes.NodeHeader, victum: ThisNode });
+            collitions.push({ position: NodePos, type: MouseCollitionNodeTypes.NodeHeader, victum: ThisNode });
 
         }
 
@@ -405,7 +405,7 @@ export function GetMouseCollitions(ThisBlueprint: Blueprint): Array<MouseColliti
 
             if (MousePos.distance(InputPos) < 8) {
 
-                collitions.push({ position: InputPos, type: MouseCollitionTypes.Input, victum: ThisNode, victumPort: ThisNode.inputs[j], victumPortIndex: j });
+                collitions.push({ position: InputPos, type: MouseCollitionNodeTypes.Input, victum: ThisNode, victumPort: ThisNode.inputs[j], victumPortIndex: j });
 
             }
 
@@ -418,7 +418,7 @@ export function GetMouseCollitions(ThisBlueprint: Blueprint): Array<MouseColliti
 
             if (MousePos.distance(OutputPos) < 8) {
 
-                collitions.push({ position: OutputPos, type: MouseCollitionTypes.Output, victum: ThisNode, victumPort: ThisNode.outputs[j], victumPortIndex: j });
+                collitions.push({ position: OutputPos, type: MouseCollitionNodeTypes.Output, victum: ThisNode, victumPort: ThisNode.outputs[j], victumPortIndex: j });
 
             }
 

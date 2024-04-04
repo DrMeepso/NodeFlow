@@ -1,4 +1,4 @@
-import { Node, Input, Output, Types } from "../node";
+import { Node, Input, Output, NodeTypes } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
 class Concat extends Node {
@@ -7,8 +7,8 @@ class Concat extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("String 1", Types.String), new Input("String 2", Types.String)];
-        this.outputs = [new Output("String", Types.String)];
+        this.inputs = [new Input("String 1", NodeTypes.String), new Input("String 2", NodeTypes.String)];
+        this.outputs = [new Output("String", NodeTypes.String)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -32,8 +32,8 @@ class Length extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("String", Types.String)];
-        this.outputs = [new Output("Length", Types.Number)];
+        this.inputs = [new Input("String", NodeTypes.String)];
+        this.outputs = [new Output("Length", NodeTypes.Number)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -56,8 +56,8 @@ class CharAt extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("String", Types.String), new Input("Index", Types.Number)];
-        this.outputs = [new Output("Char", Types.String)];
+        this.inputs = [new Input("String", NodeTypes.String), new Input("Index", NodeTypes.Number)];
+        this.outputs = [new Output("Char", NodeTypes.String)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -81,8 +81,8 @@ class ToString extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("Value", Types.Any)];
-        this.outputs = [new Output("String", Types.String)];
+        this.inputs = [new Input("Value", NodeTypes.Any)];
+        this.outputs = [new Output("String", NodeTypes.String)];
     }
 
     async run(runtime: Runtime): Promise<void> {

@@ -1,4 +1,4 @@
-import { Node, Input, Output, Types } from "../node";
+import { Node, Input, Output, NodeTypes } from "../node";
 import { Blueprint, Runtime, Variable } from "../blueprint";
 
 class Addition extends Node {
@@ -8,8 +8,8 @@ class Addition extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("A", Types.Number), new Input("B", Types.Number)];
-        this.outputs = [new Output("Result", Types.Number)];
+        this.inputs = [new Input("A", NodeTypes.Number), new Input("B", NodeTypes.Number)];
+        this.outputs = [new Output("Result", NodeTypes.Number)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -32,8 +32,8 @@ class Subtraction extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("A", Types.Number), new Input("B", Types.Number)];
-        this.outputs = [new Output("Result", Types.Number)];
+        this.inputs = [new Input("A", NodeTypes.Number), new Input("B", NodeTypes.Number)];
+        this.outputs = [new Output("Result", NodeTypes.Number)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -56,8 +56,8 @@ class Multiplication extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("A", Types.Number), new Input("B", Types.Number)];
-        this.outputs = [new Output("Result", Types.Number)];
+        this.inputs = [new Input("A", NodeTypes.Number), new Input("B", NodeTypes.Number)];
+        this.outputs = [new Output("Result", NodeTypes.Number)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -80,8 +80,8 @@ class Division extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("A", Types.Number), new Input("B", Types.Number)];
-        this.outputs = [new Output("Result", Types.Number)];
+        this.inputs = [new Input("A", NodeTypes.Number), new Input("B", NodeTypes.Number)];
+        this.outputs = [new Output("Result", NodeTypes.Number)];
     }
 
     async run(runtime: Runtime): Promise<void> {
@@ -104,8 +104,8 @@ class Modulo extends Node {
 
     constructor() {
         super();
-        this.inputs = [new Input("A", Types.Number), new Input("B", Types.Number)];
-        this.outputs = [new Output("Result", Types.Number)];
+        this.inputs = [new Input("A", NodeTypes.Number), new Input("B", NodeTypes.Number)];
+        this.outputs = [new Output("Result", NodeTypes.Number)];
     }
 
     async run(runtime: Runtime): Promise<void> {
