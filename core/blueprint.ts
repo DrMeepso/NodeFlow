@@ -1,6 +1,6 @@
 import { Vector2 } from "./generics";
 import { Node, Connection, Types, Input, Output, StartNode, EventNode } from "./node"
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from "./uuid"
 import type { serializedBlueprint } from "./serialization";
 import { deserializeBlueprint } from "./serialization";
 import type { Catagory } from "./nodes";
