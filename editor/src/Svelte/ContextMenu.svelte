@@ -6,46 +6,19 @@
     export let CurrentBlueprint: Blueprint
 
     // import nodes from files
-    import * as AllNodeClases from "../../../core/nodes/index"
     import { Vector2, Node, Blueprint, GenericNode, Types, Constant } from "../../../core";
 
     import { GetMouseCollitions } from "../GUI/render";
 
     import Icon from '@iconify/svelte';
+    import type { Catagory } from "../../../core/nodes/index";
 
-    let allCatagories: Catagory[] = []
-    Object.values(AllNodeClases).forEach( (category: any) => {
-
-        let thisCatigory: Catagory
-
-        if (category.default) {
-            thisCatigory = category.default
-        } else {
-            thisCatigory = category
-        }
-
-        allCatagories.push(thisCatigory)
-
-    })
+    let allCatagories: Catagory[] = CurrentBlueprint.avalibleNodes
 
     interface NodeEntry {
 
         name: string
         node: typeof GenericNode
-
-    }
-
-    interface Catagory {
-
-        name: string
-        category: string
-        description: string
-        id: string
-        colour: string
-
-        hide?: boolean
-
-        nodes: NodeEntry[]
 
     }
 
@@ -57,6 +30,8 @@
     function Context(e: MouseEvent){
 
         e.preventDefault()
+
+        allCatagories = CurrentBlueprint.avalibleNodes
 
         if (GetMouseCollitions(CurrentBlueprint).find(e => e.type == 2 || e.type == 3)) return
 

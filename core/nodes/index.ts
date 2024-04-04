@@ -3,7 +3,7 @@ import Logic from './logic';
 import Debug from './debug';
 import Math from './maths';
 import String from './string';
-import { SetVariable, GetVariable, StartNode, GenericNode, Constant } from '../node';
+import { SetVariable, GetVariable, StartNode, GenericNode, Constant, EventNode } from '../node';
 
 interface NodeEntry {
 
@@ -12,7 +12,7 @@ interface NodeEntry {
 
 }
 
-interface Catagory {
+export interface Catagory {
 
     name: string
     category: string
@@ -20,26 +20,27 @@ interface Catagory {
     id: string
     colour: string
 
+    hide?: boolean
+
     nodes: NodeEntry[]
 
 }
 
 let Variables = {
-
     name: "Variables",
     category: "Core",
     description: "Variable nodes",
     id: "variables",
     colour: "#ff0000",
 
+    hide: true,
+
     nodes: [
-
-        { name: "Set Variable", node: SetVariable },
-        { name: "Get Variable", node: GetVariable }
-
+        { name: "SetVariable", node: SetVariable },
+        { name: "GetVariable", node: GetVariable }
     ]
+} as unknown as Catagory
 
-}
 let System = {
 
     name: "System",
@@ -53,10 +54,12 @@ let System = {
     nodes: [
 
         { name: "Start", node: StartNode },
-        { name: "Constant", node: Constant }
+        { name: "Constant", node: Constant },
+        { name: "GenericNode", node: GenericNode },
+        { name: "EventNode", node: EventNode }
 
     ]
 
-};
+} as Catagory
 
 export { Controll, Logic, Debug, Variables, Math, String, System };

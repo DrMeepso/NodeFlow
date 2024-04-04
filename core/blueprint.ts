@@ -3,9 +3,12 @@ import { Node, Connection, Types, Input, Output, StartNode, EventNode } from "./
 import { v4 as uuidv4 } from 'uuid';
 import type { serializedBlueprint } from "./serialization";
 import { deserializeBlueprint } from "./serialization";
+import type { Catagory } from "./nodes";
+import * as defaultNodes from "./nodes/index";
 
 interface Dependency { }
 
+//could be a interface or type
 export class Variable {
 
     name: string;
@@ -35,6 +38,8 @@ export class Blueprint {
     dependencies: Dependency[] = [];
     isRunningOnServer: boolean = false;
 
+    avalibleNodes: Catagory[] = [];
+
     // unused if no GUI is present
     Camera = {
         Position: { x: 0, y: 0 } as Vector2,
@@ -48,6 +53,30 @@ export class Blueprint {
         let StartingNode = new StartNode();
         StartingNode._position = new Vector2(0, 0);
         this.addNode(StartingNode);
+
+        this.loadDefaultNodes();
+
+    }
+
+    private loadCatagoryFile(filePath: string) {
+
+        // load node file
+        import( /* @vite-ignore */ filePath).then(module => {
+
+            const catagor = module.default as Catagory;
+            this.avalibleNodes.push(catagor);
+
+        })
+
+    }
+
+    private loadDefaultNodes() {
+
+        let cat: Catagory[] = Object.values(defaultNodes)
+
+        cat.forEach(node => {
+            this.avalibleNodes.push(node);
+        })
 
     }
 
@@ -195,9 +224,9 @@ export class Blueprint {
 
     loadBlueprint(serialized: serializedBlueprint) {
 
-        
+
         let newBP = deserializeBlueprint(serialized);
-       
+
         this.allNodes = newBP.allNodes;
         this.allConnections = newBP.allConnections;
         this.allVariables = newBP.allVariables;
@@ -208,8 +237,7 @@ export class Blueprint {
 
     async triggerEvent(event: string, data: any[]) {
 
-        if (!this._isRunning)
-        {
+        if (!this._isRunning) {
             console.warn("Blueprint is not running")
             return;
         }
