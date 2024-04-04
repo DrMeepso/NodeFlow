@@ -1,9 +1,18 @@
 # Nodeflow
 A Node and Blueprint based programming interface made using Typescript.
 
-All core functionality is in the Code folder and is standalone and is able to run on the web and serverside (node, bun, ect).
+## Goal
+The goal of Nodeflow is to create a visual programming interface that can be used to create applications. The interface is based on nodes and blueprints. Nodes are the building blocks of the application, and blueprints are the connections between the nodes. The interface is designed to be easy to use and understand, and to allow for the creation of complex applications. And the core library is designed to be flexible and extensible, so that it can be used in a wide variety of applications.
 
-The blueprint editor is written is Svelte and Typescirpt and is able to run on the web and electron. using the core library.
+## Use
+The core Nodeflow library is located in the `core` directory. This contains the core classes and interfaces for creating a Nodeflow application, These can be used in a web application or a Node.js application. It contains no dependencies and can be used in any environment that supports Typescript / Javascript.
 
-if you make anything cool with this please let me know, I would love to see it!!!!! 
-also feel free to correct my spelling and grammar (i am dyslexic) it is much appreciated.
+The `web` directory contains a web application that uses the core library to create a Nodeflow interface. This can be used as a reference for creating your own Nodeflow application. it uses Vite and Svelte to render the interface.
+
+## Development
+To start the web application / editor, run the following commands:
+```bash
+npm install # or "yarn install"
+cd web
+npm run dev
+```
