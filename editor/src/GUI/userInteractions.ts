@@ -171,11 +171,11 @@ export function SetupUserInteractions(CurrentBlueprint: Blueprint) {
 
             if (Distance(MousePos, PausePos) < 15) {
 
-                //console.log("Pause");
+                console.log("Pause");
 
             } else if (Distance(MousePos, StopPos) < 15) {
 
-                //console.log("Stop");
+                CurrentBlueprint._isRunning = false;
 
             }
 

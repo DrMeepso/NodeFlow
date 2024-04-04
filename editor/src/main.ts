@@ -8,12 +8,19 @@ import { writable } from 'svelte/store'
 import { Node, StartNode, Types, GenericNode, Blueprint, Vector2, DefaultNodes, Log } from "../../core/";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
+import { EventNode, Output } from '../../core/node';
 
 const test: Log[] = []
 const bp = new Blueprint();
 bp.runtime.lissenForLog((log?: Log) => {
     logs.$set({ logs: bp.runtime.RecordedLogs })
 })
+
+const testEvent = new EventNode("onTest", [
+    new Output("testValue", Types.String)
+])
+
+bp.addNode(testEvent);
 
 const logs = new Logs({
     target: document.getElementById('logs')!,
@@ -32,8 +39,6 @@ const context = new ContextMenu({
     }
 
 })
-
-let testVariable = bp.createVariable("Test Number", Types.Number, 0);
 
 SetupUserInteractions(bp);
 
@@ -62,9 +67,10 @@ window.blueprint = bp;
 
 window.runExicutionOrder = () => {
 
-    console.log(bp.runBlueprint());
+    bp.triggerEvent("onTest", [ "Hello World!" ]);
 
 }
+
 window.runBlueprint = () => {
 
     bp.runBlueprint();
@@ -74,7 +80,7 @@ window.runBlueprint = () => {
 import { serializeBlueprint } from "../../core/serialization";
 window.serializeBlueprint = () => {
 
-    console.log(serializeBlueprint(bp));
+    return serializeBlueprint(bp)
 
 }
 

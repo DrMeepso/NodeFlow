@@ -70,7 +70,7 @@ export abstract class Node {
     inputs: Input[] = [];
     outputs: Output[] = [];
 
-    linear: boolean = true; // set to false for things that have 2 signal outputs
+    linear: boolean = true; // set to false for things that have 2 or more signal outputs
 
     parentBlueprint: Blueprint | null = null;
 
@@ -263,5 +263,32 @@ export class Constant extends Node {
 
     }
 
+}
+
+export class EventNode extends Node {
+
+    name: string = "Event"
+
+    constructor(eventName: string, values: Output[]) {
+        super();
+        this.inputs = [];
+        this.outputs = [new Output("Signal", Types.Signal), ...values];
+        this.name = eventName;
+    }
+
+    public setValues(values: any[]) {
+
+        for (let i = 1; i < this.outputs.length; i++) {
+            let output = this.outputs[i];
+            this.setOutput(output.name, values[i - 1] || null);
+        }
+
+    }
+
+    async run(runtime: Runtime): Promise<void> {
+
+        this.setOutput("Signal", null);
+
+    }
 
 }

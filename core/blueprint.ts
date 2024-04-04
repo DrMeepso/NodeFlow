@@ -1,5 +1,5 @@
 import { Vector2 } from "./generics";
-import { Node, Connection, Types, Input, Output, StartNode } from "./node"
+import { Node, Connection, Types, Input, Output, StartNode, EventNode } from "./node"
 import { v4 as uuidv4 } from 'uuid';
 import type { serializedBlueprint } from "./serialization";
 import { deserializeBlueprint } from "./serialization";
@@ -48,11 +48,6 @@ export class Blueprint {
         let StartingNode = new StartNode();
         StartingNode._position = new Vector2(0, 0);
         this.addNode(StartingNode);
-
-        // detects node, dont know about dino
-        //if (typeof Window === 'undefined') {
-            //this.isRunningOnServer = true;
-        //}
 
     }
 
@@ -164,6 +159,9 @@ export class Blueprint {
 
         await this.runThoughExicutionOrder(ExicutionOrder);
 
+        // check if there are any events in the current blueprint, if so we cant finish the blueprint because the events can be triggered at any time
+        if (this.allNodes.some(node => node instanceof EventNode)) return;
+
         this._isRunning = false;
 
         console.log("Blueprint finished running")
@@ -176,7 +174,8 @@ export class Blueprint {
             let node = ExicutionOrder[i];
             this.runtime.CurrentNode = node;
             await node.run(this.runtime);
-            //console.log("Ran node: " + node.name)
+            this.runtime.CurrentNode = null;
+            if (this._isRunning == false) return;
         }
 
     }
@@ -199,15 +198,34 @@ export class Blueprint {
         
         let newBP = deserializeBlueprint(serialized);
        
-        console.log(newBP)
-
         this.allNodes = newBP.allNodes;
         this.allConnections = newBP.allConnections;
         this.allVariables = newBP.allVariables;
 
         this.runtime.clearContext();
 
+    }
 
+    async triggerEvent(event: string, data: any[]) {
+
+        if (!this._isRunning)
+        {
+            console.warn("Blueprint is not running")
+            return;
+        }
+
+        let node: EventNode | undefined = this.allNodes.find(node => node.name === event && node instanceof EventNode) as EventNode
+
+        if (node == undefined) {
+            console.warn("No event with name " + event + " found")
+            return;
+        }
+
+        node.setValues(data);
+
+        let exOrder = await this.getNodeExicutionOrder(node);
+        console.log(exOrder)
+        await this.runThoughExicutionOrder(exOrder);
 
     }
 
