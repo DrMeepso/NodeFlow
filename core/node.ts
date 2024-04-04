@@ -3,6 +3,7 @@ import { Blueprint, Runtime, Variable } from "./blueprint";
 import { LogLevels, Log } from "./blueprint";
 import { uuidv4 } from "./uuid"
 
+// Need to fingure out how to allow for custom types to be added
 export enum Types {
 
     Signal,

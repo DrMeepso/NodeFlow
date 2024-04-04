@@ -13,6 +13,6 @@ The `web` directory contains a web application that uses the core library to cre
 To start the web application / editor, run the following commands:
 ```bash
 npm install # or "yarn install"
-cd web
+cd editor
 npm run dev
 ```

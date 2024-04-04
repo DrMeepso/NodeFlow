@@ -2,15 +2,11 @@ import Logs from './Svelte/Logs.svelte'
 import ContextMenu from './Svelte/ContextMenu.svelte';
 import { writable } from 'svelte/store'
 
-//export default app
-
-//import { Blueprint } from "./bp/blueprint";
 import { Node, StartNode, Types, GenericNode, Blueprint, Vector2, DefaultNodes, Log } from "../../core/";
 import { RenderBlueprint } from "./GUI/render";
 import { SetupUserInteractions } from "./GUI/userInteractions";
 import { EventNode, Output } from '../../core/node';
 
-const test: Log[] = []
 const bp = new Blueprint();
 bp.runtime.lissenForLog((log?: Log) => {
     logs.$set({ logs: bp.runtime.RecordedLogs })
