@@ -1,18 +1,14 @@
 <script lang="ts">
 
-    export let visible: boolean = false
-    export let position: Vector2 = new Vector2(0, 0)
-
-    export let CurrentBlueprint: Blueprint
-
-    // import nodes from files
-    import { Vector2, Node, Blueprint, GenericNode, NodeTypes, Constant } from "../../../core";
-
+    import { Vector2, Blueprint, GenericNode, NodeTypes, Constant } from "../../../core";
     import { GetMouseCollitions } from "../GUI/render";
-
     import Icon from '@iconify/svelte';
     import type { Catagory } from "../../../core/nodes/index";
     import type { NodeType } from "../../../core/node";
+
+    export let visible: boolean = false
+    export let position: Vector2 = new Vector2(0, 0)
+    export let CurrentBlueprint: Blueprint
 
     let allCatagories: Catagory[] = CurrentBlueprint.avalibleNodes
 
